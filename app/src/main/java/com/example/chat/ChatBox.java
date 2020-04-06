@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -22,7 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListener{
     FirebaseAuth auth;
-    DatabaseReference db;
+    DatabaseReference db,df;
     private TableLayout t;
     String u;
     int c=0;
@@ -32,19 +33,31 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         setContentView(R.layout.activity_chat_box);
         auth=FirebaseAuth.getInstance();
         t=findViewById(R.id.table);
-        db= FirebaseDatabase.getInstance().getReference().child("Users");
+        db= FirebaseDatabase.getInstance().getReference().child("ChatBox");
+        df=FirebaseDatabase.getInstance().getReference().child("Users");
         db.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot d1 : dataSnapshot.getChildren())  {
                     u=d1.getKey();
                     final TableRow tr=new TableRow(getApplicationContext());
-                    tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT,TableLayout.LayoutParams.FILL_PARENT));
+                    tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT,TableLayout.LayoutParams.WRAP_CONTENT));
                     Button b=new Button(getApplicationContext());
-                    b.setText(u);
+
                     b.setTextSize(30);
-                    if(!u.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
+                    if(u.contains(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
                     {
+                        String t1=u.substring(0,u.indexOf('^')),t2=u.substring(u.indexOf('^')+1);
+                        if(t1.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
+                        {
+                            b.setText(t2);
+                        }
+                        else if(t2.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
+                        {
+                            b.setText(t1);
+                        }
+                        b.setPadding(20,20,20,20);
+                        b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
                         b.setId(c);
                         c++;
                         tr.addView(b);
@@ -59,7 +72,6 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
             }
         });
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

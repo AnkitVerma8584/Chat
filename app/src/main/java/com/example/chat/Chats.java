@@ -54,12 +54,12 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         {
             if((int)(a1.charAt(i))<(int)(p1.charAt(i)))
             {
-                n=a1+p1;
+                n=""+(a1+"^"+p1);
                 break;
             }
             else if((int)(a1.charAt(i))>(int)(p1.charAt(i)))
             {
-                n=p1+a1;
+                n=""+(p1+"^"+a1);
                 break;
             }
             i++;

@@ -25,7 +25,7 @@
         android:id="@+id/textView2"
         android:layout_width="273dp"
         android:layout_height="63dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="16dp"
         android:text="New User? Register your email id here."
         android:textAlignment="center"
         android:textSize="20sp"
@@ -37,11 +37,12 @@
         android:id="@+id/editText"
         android:layout_width="330dp"
         android:layout_height="58dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Email ID"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
@@ -49,7 +50,7 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="208dp"
         android:text="Procced"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -58,15 +59,17 @@
 
     <EditText
         android:id="@+id/editText2"
-        android:layout_width="325dp"
-        android:layout_height="53dp"
+        android:layout_width="330dp"
+        android:layout_height="62dp"
         android:ems="10"
         android:hint="Password"
         android:inputType="textPassword"
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText" />
+        app:layout_constraintTop_toBottomOf="@+id/editText"
+        app:layout_constraintVertical_bias="0.089" />
 
     <TextView
         android:id="@+id/textView3"
@@ -77,4 +80,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button" />
+
+    <EditText
+        android:id="@+id/editText4"
+        android:layout_width="323dp"
+        android:layout_height="67dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:hint="Your Name"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.454"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText2"
+        app:layout_constraintVertical_bias="0.24" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
