@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +22,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import static android.graphics.Color.BLUE;
+
 public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListener{
     FirebaseAuth auth;
     DatabaseReference db,df;
@@ -31,6 +34,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_box);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(BLUE));
         auth=FirebaseAuth.getInstance();
         t=findViewById(R.id.table);
         db= FirebaseDatabase.getInstance().getReference().child("ChatBox");
@@ -51,16 +55,22 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         if(t1.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
                         {
                             b.setText(t2);
+                            b.setPadding(20,20,20,20);
+                            b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                            b.setId(c);
+                            c++;
+                            tr.addView(b);
                         }
                         else if(t2.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
                         {
                             b.setText(t1);
+                            b.setPadding(20,20,20,20);
+                            b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                            b.setId(c);
+                            c++;
+                            tr.addView(b);
                         }
-                        b.setPadding(20,20,20,20);
-                        b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-                        b.setId(c);
-                        c++;
-                        tr.addView(b);
+
                     }
                     t.addView(tr);
                 }

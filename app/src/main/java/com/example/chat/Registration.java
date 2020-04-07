@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +30,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.concurrent.TimeUnit;
 
+import static android.graphics.Color.BLUE;
+
 public class Registration extends AppCompatActivity implements View.OnClickListener {
     private EditText e,p,e4;
     private TextView t;
@@ -41,6 +44,8 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(BLUE));
+        getSupportActionBar().setTitle("Registration Page");
         if(savedInstanceState!=null){
             onRestoreInstanceState(savedInstanceState);
         }

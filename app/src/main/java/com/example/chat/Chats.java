@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -22,6 +23,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import static android.graphics.Color.BLUE;
+
 public class Chats extends AppCompatActivity implements View.OnClickListener {
     String p,a;
     DatabaseReference db;
@@ -34,9 +37,11 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chats);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(BLUE));
         Intent intent=getIntent();
         p=intent.getExtras().getString("person");
         auth=FirebaseAuth.getInstance();
+        getSupportActionBar().setTitle(p);
         t=findViewById(R.id.table);
         a=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
         chatbase(a,p);
@@ -61,6 +66,11 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             {
                 n=""+(p1+"^"+a1);
                 break;
+            }else{
+                if(a1.length()<p1.length())
+                    n=""+(a1+"^"+p1);
+                else
+                    n=""+(p1+"^"+a1);
             }
             i++;
         }
