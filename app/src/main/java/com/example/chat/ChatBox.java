@@ -177,10 +177,27 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
     }
 
     @Override
-    public void applyTexts(String n) {
-        Intent Int=new Intent(getApplicationContext(),Chats.class);
-        Int.putExtra("person",n);
-        finish();
-        startActivity(Int);
+    public void applyTexts(final String n) {
+        final Intent Int=new Intent(getApplicationContext(),Chats.class);
+
+        df.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot d1: dataSnapshot.getChildren()){
+                    User u=d1.getValue(User.class);
+                    if(n.equals(d1.getKey()))
+                    {
+                        Int.putExtra("person",n+"&"+u.email);
+                        finish();
+                        startActivity(Int);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }
