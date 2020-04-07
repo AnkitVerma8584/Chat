@@ -44,7 +44,6 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(BLUE));
         getSupportActionBar().setTitle("Registration Page");
         if(savedInstanceState!=null){
             onRestoreInstanceState(savedInstanceState);

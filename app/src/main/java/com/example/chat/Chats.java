@@ -1,10 +1,12 @@
 package com.example.chat;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -37,7 +39,6 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chats);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(BLUE));
         Intent intent=getIntent();
         p=intent.getExtras().getString("person");
         String t1=p.substring(p.indexOf('&')+1);
@@ -94,14 +95,17 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                         tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.MATCH_PARENT));
                         tr.setGravity(Gravity.CENTER);
                         TextView tv=new TextView(getApplicationContext());
+                        tv.setTextSize(25);
                         if(u.email.contains(a+"\\")){
                             String z=(u.email.substring(u.email.indexOf('\\')+1));
                             tv.setText(z);
                             tv.setGravity(Gravity.END);
+                            tv.setPadding(200,5,5,5);
                         }
                         if(u.email.contains(p+"\\")){
                             String z=(u.email.substring(u.email.indexOf('\\')+1));
                             tv.setText(z);
+                            tv.setPadding(5,5,200,5);
                         }
                         tr.addView(tv);
                         t.addView(tr);

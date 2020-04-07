@@ -34,7 +34,6 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_box);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(BLUE));
         auth=FirebaseAuth.getInstance();
         t=findViewById(R.id.table);
         db= FirebaseDatabase.getInstance().getReference().child("ChatBox");
