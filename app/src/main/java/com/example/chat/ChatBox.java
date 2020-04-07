@@ -28,7 +28,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
     FirebaseAuth auth;
     DatabaseReference db,df;
     private TableLayout t;
-    String u;
+    String u,n2;
     int c=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +54,8 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         String t1=u.substring(0,u.indexOf('^')),t2=u.substring(u.indexOf('^')+1);
                         if(t1.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
                         {
-                            b.setText(t2);
+                            getname(t2,c);
+                            //b.setText(n2);
                             b.setPadding(20,20,20,20);
                             b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
                             b.setId(c);
@@ -63,7 +64,8 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         }
                         else if(t2.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
                         {
-                            b.setText(t1);
+                            getname(t1,c);
+                            //b.setText(n2);
                             b.setPadding(20,20,20,20);
                             b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
                             b.setId(c);
@@ -76,6 +78,52 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                 }
                 checkClick();
             }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void getname(final String n,final int t)
+    {
+        df.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot d1: dataSnapshot.getChildren()){
+                    User u=d1.getValue(User.class);
+                    if(n.equals(d1.getKey()))
+                    {
+                        Button b=findViewById(t);
+                        b.setText(u.email);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void getEmail(final String n)
+    {
+        df.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot d1: dataSnapshot.getChildren()){
+                    User u=d1.getValue(User.class);
+                    if(n.equals(u.email))
+                    {
+                        Intent Int=new Intent(getApplicationContext(),Chats.class);
+                        Int.putExtra("person",""+d1.getKey()+"&"+u.email);
+                        finish();
+                        startActivity(Int);
+                    }
+                }
+            }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -114,10 +162,8 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
             b.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent Int=new Intent(getApplicationContext(),Chats.class);
-                    Int.putExtra("person",""+b.getText());
-                    finish();
-                    startActivity(Int);
+                    getEmail(""+b.getText());
+
                 }
             });
         }

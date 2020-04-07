@@ -40,8 +40,10 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(BLUE));
         Intent intent=getIntent();
         p=intent.getExtras().getString("person");
+        String t1=p.substring(p.indexOf('&')+1);
+        p=p.substring(0,p.indexOf('&'));
         auth=FirebaseAuth.getInstance();
-        getSupportActionBar().setTitle(p);
+        getSupportActionBar().setTitle(t1);
         t=findViewById(R.id.table);
         a=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
         chatbase(a,p);
