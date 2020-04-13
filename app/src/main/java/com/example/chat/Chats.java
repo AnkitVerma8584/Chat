@@ -61,7 +61,6 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         b.setOnClickListener(this);
         text=findViewById(R.id.editText3);
         scr=findViewById(R.id.scrollView2);
-        text.setOnClickListener(this);
     }
 
     public void chatbase(String a1,String p1)
@@ -169,9 +168,6 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             chatbase(a,p);
             addChat(a+"\\"+n);
         }
-        if(v==text)
-        {
-
-        }
     }
+
 }

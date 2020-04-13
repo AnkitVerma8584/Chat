@@ -1,7 +1,9 @@
 package com.example.chat;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -54,5 +56,21 @@ public class Info extends AppCompatActivity implements View.OnClickListener {
             finish();
             startActivity(new Intent(getApplicationContext(),Login.class));
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder alt=new AlertDialog.Builder(this);
+        alt.setTitle("Warning!")
+                .setCancelable(false)
+                .setMessage("Please fill in the details and save to proceed.")
+                .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog a=alt.create();
+        a.show();
     }
 }

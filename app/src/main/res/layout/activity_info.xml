@@ -8,91 +8,73 @@
 
     <EditText
         android:id="@+id/name"
-        android:layout_width="260dp"
-        android:layout_height="50dp"
+        android:layout_width="335dp"
+        android:layout_height="67dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="75dp"
-        android:layout_marginTop="258dp"
-        android:layout_marginEnd="75dp"
+        android:layout_marginTop="56dp"
+        android:background="@drawable/message"
         android:ems="10"
         android:hint="Enter your full name"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:padding="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.262" />
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
     <Button
         android:id="@+id/save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="134dp"
+        android:layout_height="53dp"
         android:layout_below="@+id/status"
-        android:layout_marginTop="10dp"
-        android:background="#536DFE"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/login_button"
         android:text="Save"
+        android:textAllCaps="false"
+        android:textSize="25sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.137"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.747" />
+        app:layout_constraintTop_toBottomOf="@+id/status"
+        app:layout_constraintVertical_bias="0.022" />
 
     <EditText
         android:id="@+id/status"
-        android:layout_width="260dp"
-        android:layout_height="53dp"
+        android:layout_width="332dp"
+        android:layout_height="65dp"
         android:layout_below="@+id/name"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="75dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="75dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/message"
         android:ems="10"
         android:hint="Status"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:padding="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.3"
+        app:layout_constraintHorizontal_bias="0.481"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.636" />
+        app:layout_constraintTop_toBottomOf="@+id/name" />
 
     <TextView
         android:id="@+id/textView4"
-        android:layout_width="380dp"
-        android:layout_height="65dp"
+        android:layout_width="356dp"
+        android:layout_height="89dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="1dp"
-        android:text="Enter your details."
-        android:textAlignment="center"
+        android:text="A few more details..."
+        android:textColor="#020300"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.69"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.027" />
+        app:layout_constraintVertical_bias="0.103"
+        tools:textSize="35sp" />
 
-
-
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="180dp"
-        android:layout_height="20dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="234dp"
-        android:text="Tap to select an image."
-        android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.186" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

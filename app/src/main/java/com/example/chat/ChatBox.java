@@ -1,8 +1,11 @@
 package com.example.chat;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -49,6 +52,12 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         if(t1.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
                         {
                             getname(t2,c);
+                            Drawable bac=getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
+                            b.setBackground(bac);
+                            Drawable left=getApplicationContext().getResources().getDrawable(R.drawable.ic_person_black_24dp);
+                            left.setBounds(0,0,60,60);
+                            b.setCompoundDrawables(left,null,null,null);
+                            b.setCompoundDrawablePadding(20);
                             b.setPadding(20,20,20,20);
                             b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
                             b.setId(c);
@@ -58,6 +67,12 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         else if(t2.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
                         {
                             getname(t1,c);
+                            Drawable bac=getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
+                            b.setBackground(bac);
+                            Drawable left=getApplicationContext().getResources().getDrawable(R.drawable.ic_person_black_24dp);
+                            left.setBounds(0,0,60,60);
+                            b.setCompoundDrawables(left,null,null,null);
+                            b.setCompoundDrawablePadding(20);
                             b.setPadding(20,20,20,20);
                             b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
                             b.setId(c);
@@ -191,5 +206,27 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
 
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder alt=new AlertDialog.Builder(this);
+        alt.setTitle("Warning!")
+                .setCancelable(false)
+                .setMessage("Are you sure you want to exit?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finishAffinity();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog a=alt.create();
+        a.show();
     }
 }

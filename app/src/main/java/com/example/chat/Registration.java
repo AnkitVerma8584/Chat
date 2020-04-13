@@ -39,7 +39,6 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
     String username,password;
     private ProgressDialog pd;
     private FirebaseAuth auth;
-    private DatabaseReference fd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +48,6 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
             onRestoreInstanceState(savedInstanceState);
         }
         auth=FirebaseAuth.getInstance();
-        fd=FirebaseDatabase.getInstance().getReference().child("Users");
         e=findViewById(R.id.editText);
         p=findViewById(R.id.editText2);
         b=findViewById(R.id.button);
@@ -106,4 +104,9 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        finish();
+        startActivity(new Intent(getApplicationContext(),Home.class));
+    }
 }

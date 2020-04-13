@@ -31,6 +31,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        getSupportActionBar().hide();
         getSupportActionBar().setTitle("Login Page");
         auth=FirebaseAuth.getInstance();
         if(auth.getCurrentUser()!=null)
@@ -79,5 +80,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             finish();
             startActivity(new Intent(getApplicationContext(),Registration.class));
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        startActivity(new Intent(getApplicationContext(),Home.class));
     }
 }
