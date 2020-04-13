@@ -5,14 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Chats"
-    android:backgroundTint="@color/colorPrimary">
+    android:background="@drawable/back_chat">
 
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="100dp"
-        android:background="#4A18FFFF"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:scrollbars="none"
@@ -29,25 +28,27 @@
 
     <EditText
         android:id="@+id/editText3"
-        android:layout_width="250dp"
-        android:layout_height="70dp"
+        android:layout_width="296dp"
+        android:layout_height="65dp"
+        android:background="@drawable/message"
         android:ems="10"
-        android:padding="10dp"
         android:hint="Type your message"
         android:inputType="textCapSentences"
+        android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/button2"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
 
     <Button
         android:id="@+id/button2"
-        android:layout_width="100dp"
-        android:layout_height="70dp"
-        android:layout_marginEnd="10dp"
+        android:layout_width="66dp"
+        android:layout_height="56dp"
+        android:layout_marginEnd="5dp"
         android:text="Send"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/editText3"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
+        app:layout_constraintTop_toBottomOf="@+id/scrollView2"
+        app:layout_constraintVertical_bias="0.466" />
 </androidx.constraintlayout.widget.ConstraintLayout>
