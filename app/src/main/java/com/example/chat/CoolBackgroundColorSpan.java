@@ -6,7 +6,7 @@ import android.text.style.ReplacementSpan;
 
 import androidx.annotation.NonNull;
 
-public class CoolBackgroundColorSpan extends ReplacementSpan {
+class CoolBackgroundColorSpan extends ReplacementSpan {
 
     private final int mBackgroundColor;
     private final int mTextColor;
@@ -33,7 +33,7 @@ public class CoolBackgroundColorSpan extends ReplacementSpan {
     @Override
     public void draw(@NonNull Canvas canvas, CharSequence text, int start, int end, float x, int top, int y, int bottom, @NonNull Paint paint) {
         float width = paint.measureText(text.subSequence(start, end).toString());
-        RectF rect = new RectF(x - mPaddingStart + mMarginStart, top, x + width + mPaddingEnd + mMarginStart, bottom);
+        RectF rect = new RectF(x - mPaddingStart + mMarginStart  , top, x + width + mPaddingEnd + mMarginStart, bottom);
         paint.setColor(mBackgroundColor);
         canvas.drawRoundRect(rect, mCornerRadius, mCornerRadius, paint);
         paint.setColor(mTextColor);
