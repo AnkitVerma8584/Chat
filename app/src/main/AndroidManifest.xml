@@ -9,10 +9,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Chats"></activity>
+        <activity android:name=".Info" />
+        <activity android:name=".Chats" />
         <activity android:name=".ChatBox" />
         <activity android:name=".Registration" />
-        <activity android:name=".Login">
+        <activity android:name=".Login" />
+        <activity android:name=".Home">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

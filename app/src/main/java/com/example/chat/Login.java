@@ -31,7 +31,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(BLUE));
         getSupportActionBar().setTitle("Login Page");
         auth=FirebaseAuth.getInstance();
         if(auth.getCurrentUser()!=null)

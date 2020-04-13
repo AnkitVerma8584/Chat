@@ -12,16 +12,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="100dp"
+        android:background="#4A18FFFF"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
+        android:scrollbars="none"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <TableLayout
             android:id="@+id/table"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+
             android:shrinkColumns="*"
-            android:stretchColumns="0"/>
+            android:stretchColumns="0" />
     </ScrollView>
 
     <EditText
@@ -31,7 +34,7 @@
         android:ems="10"
         android:padding="10dp"
         android:hint="Type your message"
-        android:inputType="textPersonName"
+        android:inputType="textCapSentences"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/button2"

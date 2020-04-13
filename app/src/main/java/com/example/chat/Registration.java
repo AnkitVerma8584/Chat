@@ -33,10 +33,10 @@ import java.util.concurrent.TimeUnit;
 import static android.graphics.Color.BLUE;
 
 public class Registration extends AppCompatActivity implements View.OnClickListener {
-    private EditText e,p,e4;
+    private EditText e,p;
     private TextView t;
     private Button b;
-    String username,password,name;
+    String username,password;
     private ProgressDialog pd;
     private FirebaseAuth auth;
     private DatabaseReference fd;
@@ -52,7 +52,6 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
         fd=FirebaseDatabase.getInstance().getReference().child("Users");
         e=findViewById(R.id.editText);
         p=findViewById(R.id.editText2);
-        e4=findViewById(R.id.editText4);
         b=findViewById(R.id.button);
         t=findViewById(R.id.textView3);
         pd=new ProgressDialog(this);
@@ -70,7 +69,6 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
         {
             username=e.getText().toString();
             password=p.getText().toString();
-            name=e4.getText().toString();
             if(username.length()==0)
             {
                 Toast.makeText(getApplicationContext(),"Email id cannot be blank",Toast.LENGTH_SHORT).show();
@@ -79,11 +77,6 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
             if(password.length()==0)
             {
                 Toast.makeText(getApplicationContext(),"Password cannot be blank",Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if(name.length()==0)
-            {
-                Toast.makeText(getApplicationContext(),"Name cannot be blank",Toast.LENGTH_SHORT).show();
                 return;
             }
             pd.setMessage("Registering User");
@@ -95,10 +88,8 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
                             pd.dismiss();
                             if(task.isSuccessful()){
                                 Toast.makeText(getApplicationContext(),"Registration successful",Toast.LENGTH_SHORT).show();
-                                User u=new User(name);
-                                fd.child(username.substring(0,username.indexOf('@'))).setValue(u);
                                 finish();
-                                startActivity(new Intent(getApplicationContext(),Login.class));
+                                startActivity(new Intent(getApplicationContext(),Info.class));
                             }
                             else
                             {
