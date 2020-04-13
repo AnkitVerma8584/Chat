@@ -152,9 +152,26 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                 openDialog();
                 return true;
             case R.id.item2:
-                auth.signOut();
-                finish();
-                startActivity(new Intent(getApplicationContext(),Login.class));
+                AlertDialog.Builder alt=new AlertDialog.Builder(this);
+                alt.setTitle("Warning!")
+                        .setCancelable(false)
+                        .setMessage("Are you sure you want to log out of this app?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                auth.signOut();
+                                finish();
+                                startActivity(new Intent(getApplicationContext(),Home.class));
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                AlertDialog a=alt.create();
+                a.show();
                 return true;
             default:return super.onOptionsItemSelected(item);
         }
