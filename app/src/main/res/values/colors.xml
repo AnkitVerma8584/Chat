@@ -5,4 +5,6 @@
     <color name="colorAccent">#6B31A8</color>
     <color name="button1">#E20E67</color>
     <color name="message">#CFCFCF</color>
+    <color name="rm">#18FFFF</color>
+    <color name="lm">#27B4E9</color>
 </resources>

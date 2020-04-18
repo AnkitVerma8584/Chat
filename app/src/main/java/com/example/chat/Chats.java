@@ -4,6 +4,7 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -14,8 +15,10 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -100,28 +103,24 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                     try {
                         User u = ds1.getValue(User.class);
                         final TableRow tr=new TableRow(getApplicationContext());
-                        //tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.MATCH_PARENT));
+                        tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT,TableLayout.LayoutParams.WRAP_CONTENT));
                         tr.setGravity(Gravity.CENTER);
-                        TextView tv=new TextView(getApplicationContext());
-                        tv.setTextSize(25);
                         if(u.email.contains(a+"\\")){
                             String z=(u.email.substring(u.email.indexOf('\\')+1));
-                            Spannable sp=new SpannableString(z);
-                            sp.setSpan(new BackgroundColorSpan(0xFFB8ECCC),0,z.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            tv.setText(sp);
-                            tv.setGravity(Gravity.END);
-                            tv.setPadding(200,5,5,5);
+                            LayoutInflater inflater=getLayoutInflater();
+                            View v=inflater.inflate(R.layout.right_chat,null);
+                            TextView tvt=v.findViewById(R.id.r_message);
+                            tvt.setText(z);
+                            t.addView(v);
                         }
                         if(u.email.contains(p+"\\")){
                             String z=(u.email.substring(u.email.indexOf('\\')+1));
-                            Spannable sp=new SpannableString(z);
-                            sp.setSpan(new BackgroundColorSpan(0xFFE7E788),0,z.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            tv.setText(sp);
-                            tv.setPadding(5,5,200,5);
+                            LayoutInflater inflater=getLayoutInflater();
+                            View v=inflater.inflate(R.layout.left_chat,null);
+                            TextView tvt=v.findViewById(R.id.l_message);
+                            tvt.setText(z);
+                            t.addView(v);
                         }
-                        tr.addView(tv,new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,TableRow.LayoutParams.WRAP_CONTENT,1f));
-                        t.addView(tr);
-
                     } catch (NullPointerException npe) {
                     }
                 }
