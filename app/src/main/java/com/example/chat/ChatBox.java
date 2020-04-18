@@ -3,6 +3,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -29,6 +30,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
     private TableLayout t;
     String u;
     int c=0;
+    LoadingDialog loadingDialog=new LoadingDialog(ChatBox.this);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,9 +39,11 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         t=findViewById(R.id.table);
         db= FirebaseDatabase.getInstance().getReference().child("ChatBox");
         df=FirebaseDatabase.getInstance().getReference().child("Users");
+        loadingDialog.startLoadingDialog();
         db.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                t.removeAllViews();
                 for(DataSnapshot d1 : dataSnapshot.getChildren())  {
                     u=d1.getKey();
                     final TableRow tr=new TableRow(getApplicationContext());
@@ -84,6 +88,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                     }
                     t.addView(tr);
                 }
+                loadingDialog.dismissDialog();
                 checkClick();
             }
             @Override
