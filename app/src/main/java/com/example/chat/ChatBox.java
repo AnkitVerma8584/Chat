@@ -89,7 +89,9 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                     t.addView(tr);
                 }
                 loadingDialog.dismissDialog();
-                checkClick();
+                try {
+                    checkClick();
+                } catch (Exception e) {}
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
