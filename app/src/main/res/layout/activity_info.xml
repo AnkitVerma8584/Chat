@@ -62,8 +62,8 @@
 
     <TextView
         android:id="@+id/textView4"
-        android:layout_width="366dp"
-        android:layout_height="65dp"
+        android:layout_width="338dp"
+        android:layout_height="53dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="1dp"
@@ -72,10 +72,10 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.709"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.057"
+        app:layout_constraintVertical_bias="0.069"
         tools:textSize="35sp" />
 
     <de.hdodenhof.circleimageview.CircleImageView
