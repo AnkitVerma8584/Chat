@@ -6,6 +6,10 @@
         android:title="Search People"
         app:showAsAction="never"/>
     <item   android:id="@+id/item2"
+        android:title="Account"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/item3"
         android:title="Log Out"
         app:showAsAction="never"/>
 </menu>

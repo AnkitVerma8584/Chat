@@ -1,10 +1,5 @@
 package com.example.chat;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,53 +9,87 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-public class Info extends AppCompatActivity implements View.OnClickListener {
-    EditText n,s;
-    FirebaseAuth auth;
-    Button bt;
+public class Edit extends AppCompatActivity implements View.OnClickListener{
+    TextView t;
+    EditText u,s;
     DatabaseReference db;
-    String name,status;
-    private ImageView profile;
+    FirebaseAuth auth;
+    Button b;
     private StorageReference mStorageRef;
     public static final int PICK_IMAGE=1;
     private Uri imageuri;
+    ImageView profile;
+    String durl;
     ProgressDialog progress;
+    String name,status;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
-        auth=FirebaseAuth.getInstance();
-        n=findViewById(R.id.name);
+        t=findViewById(R.id.textView4);
+        u=findViewById(R.id.name);
         s=findViewById(R.id.status);
-        db= FirebaseDatabase.getInstance().getReference().child("Users")
-                .child(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@')));
-        bt=findViewById(R.id.save);
-        bt.setOnClickListener(this);
-        mStorageRef = FirebaseStorage.getInstance().getReference();
+        b=findViewById(R.id.save);
+        b.setOnClickListener(this);
         profile=findViewById(R.id.profilepic);
-        imageuri=null;
         progress=new ProgressDialog(this);
-        Glide.with(getApplicationContext()).load("https://firebasestorage.googleapis.com/v0/b/chat-87dc0.appspot.com/o/defaultpic.jpg?alt=media&token=1bd01a63-c606-44a2-8173-d17b5df9f532").into(profile);
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+        t.setText("Edit Your Details");
+        imageuri=null;
+        auth=FirebaseAuth.getInstance();
+        db= FirebaseDatabase.getInstance().getReference().child("Users");
+        db.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                progress.setMessage("Loading...");
+                progress.show();
+                for(DataSnapshot d:dataSnapshot.getChildren()) {
+                    Details det=d.getValue(Details.class);
+                    if(d.getKey().equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
+                    {
+                        u.setText(det.n);
+                        s.setText(det.s);
+                        Glide.with(getApplicationContext()).load(det.l).into(profile);
+                        progress.dismiss();
+                        durl=det.l;
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         profile.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        if(v==bt)
-        {
-            name=n.getText().toString();
+        if(v==b) {
+            name=u.getText().toString();
             status=s.getText().toString();
             if(name.equals(""))
             {
@@ -82,33 +111,8 @@ public class Info extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==PICK_IMAGE && resultCode == RESULT_OK){
-            try {
-                imageuri=data.getData();
-                profile.setImageURI(imageuri);
-            } catch (Exception e) {}
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        AlertDialog.Builder alt=new AlertDialog.Builder(this);
-        alt.setTitle("Warning!")
-                .setCancelable(false)
-                .setMessage("Please fill in the details and save to proceed.")
-                .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        AlertDialog a=alt.create();
-        a.show();
-    }
-    void storeimage() {     //To store the pic
+    public void storeimage()
+    {
         try {
             if (imageuri != null) {
                 final StorageReference user_profile = mStorageRef.child( auth.getCurrentUser().getEmail()
@@ -129,7 +133,7 @@ public class Info extends AppCompatActivity implements View.OnClickListener {
 
                                         String img_url = uri.toString();// to store url of the image
                                         Details d=new Details(name,status,img_url);
-                                        db.setValue(d);
+                                        db.child(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))).setValue(d);
                                         Toast.makeText(getApplicationContext(),"Details Saved",Toast.LENGTH_SHORT).show();
                                         progress.dismiss();
                                         finish();
@@ -146,36 +150,32 @@ public class Info extends AppCompatActivity implements View.OnClickListener {
                             }
                         });
             } else {
-                AlertDialog.Builder alt = new AlertDialog.Builder(this);
-                alt.setTitle("Note!")
-                        .setCancelable(false)
-                        .setMessage("You have not selected any profile image.Do you want to proceed with a default image?")
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                String img_url="https://firebasestorage.googleapis.com/v0/b/chat-87dc0.appspot.com/o/defaultpic.jpg?alt=media&token=1bd01a63-c606-44a2-8173-d17b5df9f532";
-                                Details d=new Details(name,status,img_url);
-                                db.setValue(d);
-                                Toast.makeText(getApplicationContext(),"Details Saved",Toast.LENGTH_SHORT).show();
-                                finish();
-                                startActivity(new Intent(getApplicationContext(),Login.class));
-                            }
-                        });
-
-                AlertDialog a1 = alt.create();
-                a1.show();
-
+                Details d=new Details(name,status,durl);
+                db.child(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))).setValue(d);
+                Toast.makeText(getApplicationContext(),"Details Saved",Toast.LENGTH_SHORT).show();
+                finish();
+                startActivity(new Intent(getApplicationContext(),Login.class));
             }
         }catch (Exception e)
         {
             Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==PICK_IMAGE && resultCode == RESULT_OK){
+            try {
+                imageuri=data.getData();
+                profile.setImageURI(imageuri);
+            } catch (Exception e) {}
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        startActivity(new Intent(getApplicationContext(),ChatBox.class));
     }
 }

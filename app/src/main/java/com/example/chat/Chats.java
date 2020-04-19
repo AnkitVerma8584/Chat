@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -36,6 +37,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
 import static android.graphics.Color.BLUE;
 import static android.graphics.Color.YELLOW;
 
@@ -47,6 +51,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     Button b;
     EditText text;
     ScrollView scr;
+    String fname;
+    FileOutputStream fos;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +70,12 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         b.setOnClickListener(this);
         text=findViewById(R.id.editText3);
         scr=findViewById(R.id.scrollView2);
+        File dir = getApplicationContext().getDir("Chat_App", Context.MODE_PRIVATE);
+        if (!dir.exists())
+        {
+            dir.mkdirs();
+        }
+        fname="Chat_App/"+a+"^"+p;
     }
 
     public void chatbase(String a1,String p1)

@@ -159,7 +159,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
             case R.id.item1:
                 openDialog();
                 return true;
-            case R.id.item2:
+            case R.id.item3:
                 AlertDialog.Builder alt=new AlertDialog.Builder(this);
                 alt.setTitle("Warning!")
                         .setCancelable(false)
@@ -180,6 +180,10 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         });
                 AlertDialog a=alt.create();
                 a.show();
+                return true;
+            case R.id.item2:
+                finish();
+                startActivity(new Intent(getApplicationContext(),Edit.class));
                 return true;
             default:return super.onOptionsItemSelected(item);
         }
