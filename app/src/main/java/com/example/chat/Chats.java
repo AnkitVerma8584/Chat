@@ -62,7 +62,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         String t1=p.substring(p.indexOf('&')+1);
         p=p.substring(0,p.indexOf('&'));
         auth=FirebaseAuth.getInstance();
-        getSupportActionBar().setTitle(t1);
+        getSupportActionBar().setTitle(p);
         t=findViewById(R.id.table);
         a=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
         chatbase(a,p);

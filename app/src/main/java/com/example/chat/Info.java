@@ -52,7 +52,7 @@ public class Info extends AppCompatActivity implements View.OnClickListener {
         profile=findViewById(R.id.profilepic);
         imageuri=null;
         progress=new ProgressDialog(this);
-        Glide.with(getApplicationContext()).load("https://firebasestorage.googleapis.com/v0/b/chat-87dc0.appspot.com/o/defaultpic.jpg?alt=media&token=1bd01a63-c606-44a2-8173-d17b5df9f532").into(profile);
+        Glide.with(getApplicationContext()).load("https://firebasestorage.googleapis.com/v0/b/chat-87dc0.appspot.com/o/default_pic.png?alt=media&token=0319c156-031c-4b07-9a0c-27ebecdd34d1").into(profile);
         profile.setOnClickListener(this);
     }
 
@@ -160,7 +160,7 @@ public class Info extends AppCompatActivity implements View.OnClickListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
-                                String img_url="https://firebasestorage.googleapis.com/v0/b/chat-87dc0.appspot.com/o/defaultpic.jpg?alt=media&token=1bd01a63-c606-44a2-8173-d17b5df9f532";
+                                String img_url="https://firebasestorage.googleapis.com/v0/b/chat-87dc0.appspot.com/o/default_pic.png?alt=media&token=0319c156-031c-4b07-9a0c-27ebecdd34d1";
                                 Details d=new Details(name,status,img_url);
                                 db.setValue(d);
                                 Toast.makeText(getApplicationContext(),"Details Saved",Toast.LENGTH_SHORT).show();

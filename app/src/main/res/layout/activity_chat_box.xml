@@ -4,11 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChatBox" >
+    tools:context=".ChatBox">
 
     <ScrollView
+        android:id="@+id/full"
+        android:paddingTop="10dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#FFFFFF">
         <TableLayout
             android:id="@+id/table"
             android:layout_width="fill_parent"
