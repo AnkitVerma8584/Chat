@@ -24,7 +24,7 @@ public class Home extends AppCompatActivity {
         if(auth.getCurrentUser()!=null)
         {
             finish();
-            startActivity(new Intent(getApplicationContext(),Login.class));
+            startActivity(new Intent(getApplicationContext(),ChatBox.class));
         }
         l=findViewById(R.id.login);
         tv=findViewById(R.id.textView5);
