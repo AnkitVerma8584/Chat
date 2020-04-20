@@ -18,8 +18,13 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.SubscriptSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -38,7 +43,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import static android.graphics.Color.BLUE;
 import static android.graphics.Color.YELLOW;
@@ -51,8 +61,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     Button b;
     EditText text;
     ScrollView scr;
-    String fname;
-    FileOutputStream fos;
+    int c=0,fl=1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +69,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         Intent intent=getIntent();
         p=intent.getExtras().getString("person");
         String t1=p.substring(p.indexOf('&')+1);
-        p=p.substring(0,p.indexOf('&'));
+        p=p.substring(0,p.indexOf('@'));
         auth=FirebaseAuth.getInstance();
         getSupportActionBar().setTitle(t1);
         t=findViewById(R.id.table);
@@ -70,16 +79,15 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         b.setOnClickListener(this);
         text=findViewById(R.id.editText3);
         scr=findViewById(R.id.scrollView2);
-        File dir = getApplicationContext().getDir("Chat_App", Context.MODE_PRIVATE);
-        if (!dir.exists())
-        {
-            dir.mkdirs();
-        }
-
-        fname="Chat_App/"+a+"^"+p;
     }
 
-    public void chatbase(String a1,String p1)
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.chat_menu,menu);
+        return true;
+    }
+
+    public void chatbase(String a1, String p1)
     {
         int i=0;String n="";
         while(i<a1.length() && i<p1.length())
@@ -103,7 +111,6 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         }
         db=FirebaseDatabase.getInstance().getReference().child("ChatBox").child(n);
         viewChat();
-
     }
 
     public void viewChat()
@@ -112,27 +119,46 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 t.removeAllViews();
+                fl=1;
+                c=0;
                 for (DataSnapshot ds1 : dataSnapshot.getChildren()) {
                     try {
                         User u = ds1.getValue(User.class);
                         final TableRow tr=new TableRow(getApplicationContext());
                         tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT,TableLayout.LayoutParams.WRAP_CONTENT));
                         tr.setGravity(Gravity.CENTER);
-                        if(u.email.contains(a+"\\")){
-                            String z=(u.email.substring(u.email.indexOf('\\')+1));
-                            LayoutInflater inflater=getLayoutInflater();
-                            View v=inflater.inflate(R.layout.right_chat,null);
-                            TextView tvt=v.findViewById(R.id.r_message);
-                            tvt.setText(z);
-                            t.addView(v);
+                        if(!ds1.getKey().equals(a+"\\"+"BLOCK") && !ds1.getKey().equals(p+"\\"+"BLOCK")) {
+                            if (u.email.contains(a + "\\")) {
+                                String z = (u.email.substring(u.email.indexOf('\\') + 1));
+                                LayoutInflater inflater = getLayoutInflater();
+                                View v = inflater.inflate(R.layout.right_chat, null);
+                                TextView tvt = v.findViewById(R.id.r_message);
+                                if (z.indexOf('$') > -1)
+                                    tvt.setText(z.substring(0, z.indexOf('$')));
+                                else
+                                    tvt.setText(z);
+                                c++;
+                                t.addView(v);
+                            }
+                            if (u.email.contains(p + "\\")) {
+                                String z = (u.email.substring(u.email.indexOf('\\') + 1));
+                                LayoutInflater inflater = getLayoutInflater();
+                                View v = inflater.inflate(R.layout.left_chat, null);
+                                TextView tvt = v.findViewById(R.id.l_message);
+                                if (z.indexOf('$') > -1)
+                                    tvt.setText(z.substring(0, z.indexOf('$')));
+                                else
+                                    tvt.setText(z);
+                                c++;
+                                t.addView(v);
+                            }
                         }
-                        if(u.email.contains(p+"\\")){
-                            String z=(u.email.substring(u.email.indexOf('\\')+1));
-                            LayoutInflater inflater=getLayoutInflater();
-                            View v=inflater.inflate(R.layout.left_chat,null);
-                            TextView tvt=v.findViewById(R.id.l_message);
-                            tvt.setText(z);
-                            t.addView(v);
+                        else if(u.email.equals("Block"))
+                        {
+                            fl=fl*0;
+                        }
+                        else if(u.email.equals("Unblock")){
+                            fl=fl*1;
                         }
                     } catch (NullPointerException npe) {
                     }
@@ -152,11 +178,29 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         });
     }
 
-    public void addChat(String n)
-    {
-        User u=new User(n);
-        db.push().setValue(u);
-        viewChat();
+    public void addChat(String n) {
+        if(c==0)
+        {
+            User b=new User("Unblock");
+            db.child(a+"\\"+"BLOCK").setValue(b);
+            db.child(p+"\\"+"BLOCK").setValue(b);
+        }
+        String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+        String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+        if(n.contains("^BLOCK^")) {
+            User b = new User("Block");
+            db.child(a+"\\"+"BLOCK").setValue(b);
+        }
+        else if(n.contains("^UNBLOCK^")){
+            User b= new User("Unblock");
+            db.child(a+"\\"+"BLOCK").setValue(b);
+        }
+        else {
+            n = n + "$" + currentDate + "#" + currentTime;
+            User u = new User(n);
+            db.push().setValue(u);
+            viewChat();
+        }
     }
 
     @Override
@@ -169,17 +213,48 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v) {
         if(v==b)
         {
-            String n=text.getText().toString();
-            if(n.length()==0)
-            {
-                Toast.makeText(getApplicationContext(),"Message cannot be blank",Toast.LENGTH_SHORT).show();
-                return;
+            if(fl==1) {
+                String n = text.getText().toString();
+                if (n.length() == 0) {
+                    Toast.makeText(getApplicationContext(), "Message cannot be blank", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                text.setText("");
+                text.setHint("Type your message");
+                chatbase(a, p);
+                addChat(a + "\\" + n);
             }
-            text.setText("");
-            text.setHint("Type your message");
-            chatbase(a,p);
-            addChat(a+"\\"+n);
+            else
+            {
+                Toast.makeText(getApplicationContext(),"Chat is Blocked",Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.item4:
+                finish();
+                startActivity(new Intent(getApplicationContext(),ProfilePerson.class));
+                return true;
+            case R.id.item5:
+                return true;
+            case R.id.item6:
+                if(item.getTitle().equals("Block")) {
+                    chatbase(a, p);
+                    addChat(a + "\\" + "^BLOCK^");
+                    Toast.makeText(getApplicationContext(), "Blocked", Toast.LENGTH_SHORT).show();
+                    item.setTitle("Unblock");
+                }
+                else if(item.getTitle().equals("Unblock")) {
+                    chatbase(a, p);
+                    addChat(a + "\\" + "^UNBLOCK^");
+                    Toast.makeText(getApplicationContext(), "Unblocked", Toast.LENGTH_SHORT).show();
+                    item.setTitle("Block");
+                }
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

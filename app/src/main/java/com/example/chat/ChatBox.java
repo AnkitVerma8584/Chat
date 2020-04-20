@@ -42,6 +42,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
     Display display;
     LoadingDialog loadingDialog=new LoadingDialog(ChatBox.this);
     ScrollView scr;
+    int fl=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +56,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         start();
     }
     public void start(){
+        fl=0;
         try {
             loadingDialog.startLoadingDialog();
             db.addValueEventListener(new ValueEventListener() {
@@ -62,6 +64,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     t.removeAllViews();
                     scr.setBackgroundColor(Color.WHITE);
+                    fl=0;
                     c=100;
                     for(DataSnapshot d1 : dataSnapshot.getChildren())  {
                         u=d1.getKey();
@@ -143,7 +146,8 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         civ.setPadding(8,8,8,8);
                         Button b=findViewById(t);
                         b.setTextColor(Color.BLACK);
-                        b.setText(u.n+"\t"+" ("+d1.getKey()+") "+"\n"+u.s);
+                        b.setTransformationMethod(null);
+                        b.setText(u.n+"\t"+" ("+d1.getKey()+u.d+") "+"\n"+u.s);
                         b.setLeft(10);
                         b.setTextSize(18);
                     }
@@ -240,7 +244,8 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         final ImageView imv=view.findViewById(R.id.img);
                         String n=b.getText().toString();
                         scr.setBackgroundColor(Color.BLACK);
-                        final String file=n.substring(n.indexOf('(')+1,n.indexOf(')'));
+                        fl=1;
+                        final String file=n.substring(n.indexOf('(')+1,n.indexOf('@'));
                         txt.setText(n.substring(0,n.indexOf('(')-1));
                         df.addValueEventListener(new ValueEventListener() {
                             @Override
@@ -269,8 +274,10 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                     }
                 });
             } catch (Exception e) {
-                finish();
-                startActivity(new Intent(getApplicationContext(),ChatBox.class));
+                /*finish();
+                startActivity(new Intent(getApplicationContext(),ChatBox.class));*/
+                Toast.makeText(getApplicationContext(),"Picture changed",Toast.LENGTH_SHORT).show();
+                start();
             }
 
         }
@@ -289,10 +296,10 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot d1: dataSnapshot.getChildren()){
-                    User u=d1.getValue(User.class);
+                    Details u=d1.getValue(Details.class);
                     if(n.equals(d1.getKey()))
                     {
-                        Int.putExtra("person",n+"&"+u.email);
+                        Int.putExtra("person",n+u.d+"&"+u.n);
                         finish();
                         startActivity(Int);
                     }
@@ -308,23 +315,30 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
 
     @Override
     public void onBackPressed() {
-        AlertDialog.Builder alt=new AlertDialog.Builder(this);
-        alt.setTitle("Warning!")
-                .setCancelable(false)
-                .setMessage("Are you sure you want to exit?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finishAffinity();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        AlertDialog a=alt.create();
-        a.show();
+        if(fl==0){
+            /*AlertDialog.Builder alt=new AlertDialog.Builder(this);
+            alt.setTitle("Warning!")
+                    .setCancelable(false)
+                    .setMessage("Are you sure you want to exit?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finishAffinity();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            AlertDialog a=alt.create();
+            a.show();*/
+            finishAffinity();
+        }
+        else if(fl==1){
+            start();
+        }
+
     }
 }

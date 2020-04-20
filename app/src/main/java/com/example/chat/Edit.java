@@ -42,7 +42,7 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
     ImageView profile;
     String durl;
     ProgressDialog progress;
-    String name,status;
+    String name,status,domain;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +58,7 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
         t.setText("Edit Your Details");
         imageuri=null;
         auth=FirebaseAuth.getInstance();
+        domain=auth.getCurrentUser().getEmail().substring(auth.getCurrentUser().getEmail().indexOf('@'));
         db= FirebaseDatabase.getInstance().getReference().child("Users");
         db.addValueEventListener(new ValueEventListener() {
             @Override
@@ -132,7 +133,7 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
                                     public void onSuccess(Uri uri) {
 
                                         String img_url = uri.toString();// to store url of the image
-                                        Details d=new Details(name,status,img_url);
+                                        Details d=new Details(name,status,img_url,domain);
                                         db.child(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))).setValue(d);
                                         Toast.makeText(getApplicationContext(),"Details Saved",Toast.LENGTH_SHORT).show();
                                         progress.dismiss();
@@ -150,7 +151,7 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
                             }
                         });
             } else {
-                Details d=new Details(name,status,durl);
+                Details d=new Details(name,status,durl,domain);
                 db.child(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))).setValue(d);
                 Toast.makeText(getApplicationContext(),"Details Saved",Toast.LENGTH_SHORT).show();
                 finish();
