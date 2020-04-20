@@ -2,8 +2,6 @@ package com.example.chat;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -11,6 +9,7 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,61 +53,66 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         loadingDialog.startLoadingDialog();
         display=getWindowManager().getDefaultDisplay();
         scr=findViewById(R.id.full);
-        db.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                t.removeAllViews();
-                scr.setBackgroundColor(Color.WHITE);
-                for(DataSnapshot d1 : dataSnapshot.getChildren())  {
-                    u=d1.getKey();
-                    final TableRow tr=new TableRow(getApplicationContext());
-                    tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT,TableLayout.LayoutParams.WRAP_CONTENT));
-                    Button b=new Button(getApplicationContext());
-                    CircleImageView civ=new CircleImageView(getApplicationContext());
-                    if(u.contains(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
-                    {
-                        String t1=u.substring(0,u.indexOf('^')),t2=u.substring(u.indexOf('^')+1);
-                        if(t1.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
+        try {
+            db.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    t.removeAllViews();
+                    scr.setBackgroundColor(Color.WHITE);
+                    for(DataSnapshot d1 : dataSnapshot.getChildren())  {
+                        u=d1.getKey();
+                        final TableRow tr=new TableRow(getApplicationContext());
+                        tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT));
+                        Button b=new Button(getApplicationContext());
+                        CircleImageView civ=new CircleImageView(getApplicationContext());
+                        if(u.contains(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
                         {
-                            getname(t2,c);
-                            Drawable bac=getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
-                            b.setBackground(bac);
-                            b.setPadding(5,5,5,5);
-                            b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-                            b.setId(c);
-                            civ.setId(-1*c);
-                            c++;
-                            tr.addView(civ);
-                            tr.addView(b);
-                        }
-                        else if(t2.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
-                        {
-                            getname(t1,c);
-                            Drawable bac=getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
-                            b.setBackground(bac);
-                            b.setPadding(5,5,5,5);
-                            b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-                            b.setId(c);
-                            civ.setId(-1*c);
-                            c++;
-                            tr.addView(civ);
-                            tr.addView(b);
-                        }
+                            String t1=u.substring(0,u.indexOf('^')),t2=u.substring(u.indexOf('^')+1);
+                            if(t1.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
+                            {
+                                getname(t2,c);
+                                Drawable bac=getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
+                                b.setBackground(bac);
+                                b.setPadding(15,5,25000,10);
+                                b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                                b.setId(c);
+                                civ.setId(100*c);
+                                c++;
+                                tr.addView(civ);
+                                tr.addView(b);
+                            }
+                            else if(t2.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
+                            {
+                                getname(t1,c);
+                                Drawable bac=getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
+                                b.setBackground(bac);
+                                b.setPadding(15,5,25000,10);
+                                b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                                b.setId(c);
+                                civ.setId(100*c);
+                                c++;
+                                tr.addView(civ);
+                                tr.addView(b);
+                            }
 
+                        }
+                        t.addView(tr);
                     }
-                    t.addView(tr);
+                    loadingDialog.dismissDialog();
+                    try {
+                        checkClick();
+                        checkImClick();
+                    } catch (Exception e) {
+                    }
                 }
-                loadingDialog.dismissDialog();
-                try {
-                    checkClick();
-                    checkImClick();
-                } catch (Exception e) {}
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void getname(final String n,final int t)
@@ -120,15 +124,19 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                     Details u=d1.getValue(Details.class);
                     if(n.equals(d1.getKey()))
                     {
-                        CircleImageView civ=findViewById(-1*t);
+                        CircleImageView civ=findViewById(100*t);
                         Glide.with(getApplicationContext()).load(u.l).into(civ);
                         Point size=new Point();
                         display.getSize(size);
-                        civ.getLayoutParams().height=size.x/10;
-                        civ.getLayoutParams().width=size.x/10;
+                        civ.getLayoutParams().height=size.x/7;
+                        civ.getLayoutParams().width=size.x/7;
                         civ.requestLayout();
+                        civ.setLeft(5);
+                        civ.setPadding(8,8,8,8);
                         Button b=findViewById(t);
-                        b.setText(u.n+"\t"+" ("+d1.getKey()+")"+"\n"+u.s);
+                        b.setTextColor(Color.BLACK);
+                        b.setText(u.n+"\t"+" ("+d1.getKey()+") "+"\n"+u.s);
+                        b.setLeft(10);
                         b.setTextSize(18);
                     }
                 }
@@ -213,7 +221,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         for(int i=100;i<c;i++)
         {
             final Button b=findViewById(i);
-            final CircleImageView civ=findViewById(-1*i);
+            final CircleImageView civ=findViewById(100*i);
             civ.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
