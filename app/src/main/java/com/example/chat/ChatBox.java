@@ -118,20 +118,6 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         }
     }
 
-    public void load(){
-        db.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                finish();
-                startActivity(new Intent(getApplicationContext(),ChatBox.class));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
     public void getname(final String n,final int t)
     {
         df.addValueEventListener(new ValueEventListener() {
@@ -142,7 +128,12 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                     if(n.equals(d1.getKey()))
                     {
                         CircleImageView civ=findViewById(100*t);
-                        Glide.with(getApplicationContext()).load(u.l).into(civ);
+                        try {
+                            Glide.with(getApplicationContext()).load(u.l).into(civ);
+                        } catch (Exception e) {
+                            finish();
+                            startActivity(new Intent(getApplicationContext(),ChatBox.class));
+                        }
                         Point size=new Point();
                         display.getSize(size);
                         civ.getLayoutParams().height=size.x/7;
@@ -239,43 +230,48 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         {
             final Button b=findViewById(i);
             final CircleImageView civ=findViewById(100*i);
-            civ.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    LayoutInflater inflater=getLayoutInflater();
-                    View view=inflater.inflate(R.layout.pic,null);
-                    TextView txt=view.findViewById(R.id.txt);
-                    final ImageView imv=view.findViewById(R.id.img);
-                    String n=b.getText().toString();
-                    scr.setBackgroundColor(Color.BLACK);
-                    final String file=n.substring(n.indexOf('(')+1,n.indexOf(')'));
-                    txt.setText(n.substring(0,n.indexOf('(')-1));
-                    df.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for(DataSnapshot ds: dataSnapshot.getChildren()){
-                                Details u1=ds.getValue(Details.class);
-                                if(file.equals(ds.getKey()))
-                                    Glide.with(getApplicationContext()).load(u1.l).into(imv);
+            try {
+                civ.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        LayoutInflater inflater=getLayoutInflater();
+                        View view=inflater.inflate(R.layout.pic,null);
+                        TextView txt=view.findViewById(R.id.txt);
+                        final ImageView imv=view.findViewById(R.id.img);
+                        String n=b.getText().toString();
+                        scr.setBackgroundColor(Color.BLACK);
+                        final String file=n.substring(n.indexOf('(')+1,n.indexOf(')'));
+                        txt.setText(n.substring(0,n.indexOf('(')-1));
+                        df.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for(DataSnapshot ds: dataSnapshot.getChildren()){
+                                    Details u1=ds.getValue(Details.class);
+                                    if(file.equals(ds.getKey()))
+                                        Glide.with(getApplicationContext()).load(u1.l).into(imv);
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                        }
-                    });
-                    t.removeAllViews();
-                    t.addView(view);
-                    txt.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            finish();
-                            startActivity(new Intent(getApplicationContext(),ChatBox.class));
-                        }
-                    });
-                }
-            });
+                            }
+                        });
+                        t.removeAllViews();
+                        t.addView(view);
+                        txt.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                finish();
+                                startActivity(new Intent(getApplicationContext(),ChatBox.class));
+                            }
+                        });
+                    }
+                });
+            } catch (Exception e) {
+                finish();
+                startActivity(new Intent(getApplicationContext(),ChatBox.class));
+            }
 
         }
     }
