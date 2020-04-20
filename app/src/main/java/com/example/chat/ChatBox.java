@@ -316,24 +316,6 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
     @Override
     public void onBackPressed() {
         if(fl==0){
-            /*AlertDialog.Builder alt=new AlertDialog.Builder(this);
-            alt.setTitle("Warning!")
-                    .setCancelable(false)
-                    .setMessage("Are you sure you want to exit?")
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finishAffinity();
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            AlertDialog a=alt.create();
-            a.show();*/
             finishAffinity();
         }
         else if(fl==1){
