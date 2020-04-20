@@ -50,15 +50,19 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         t=findViewById(R.id.table);
         db= FirebaseDatabase.getInstance().getReference().child("ChatBox");
         df=FirebaseDatabase.getInstance().getReference().child("Users");
-        loadingDialog.startLoadingDialog();
         display=getWindowManager().getDefaultDisplay();
         scr=findViewById(R.id.full);
+        start();
+    }
+    public void start(){
         try {
+            loadingDialog.startLoadingDialog();
             db.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     t.removeAllViews();
                     scr.setBackgroundColor(Color.WHITE);
+                    c=100;
                     for(DataSnapshot d1 : dataSnapshot.getChildren())  {
                         u=d1.getKey();
                         final TableRow tr=new TableRow(getApplicationContext());
@@ -94,7 +98,6 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                                 tr.addView(civ);
                                 tr.addView(b);
                             }
-
                         }
                         t.addView(tr);
                     }
@@ -115,6 +118,20 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         }
     }
 
+    public void load(){
+        db.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                finish();
+                startActivity(new Intent(getApplicationContext(),ChatBox.class));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
     public void getname(final String n,final int t)
     {
         df.addValueEventListener(new ValueEventListener() {
@@ -205,7 +222,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
     {
         for(int i=100;i<c;i++)
         {
-            final Button b=findViewById(i);
+            final Button b=scr.findViewById(i);
             b.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

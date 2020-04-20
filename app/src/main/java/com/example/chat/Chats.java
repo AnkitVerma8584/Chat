@@ -75,6 +75,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         {
             dir.mkdirs();
         }
+
         fname="Chat_App/"+a+"^"+p;
     }
 
