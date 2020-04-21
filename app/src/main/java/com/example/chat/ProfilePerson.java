@@ -38,7 +38,10 @@ public class ProfilePerson extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Details d1=dataSnapshot.getValue(Details.class);
                 n.setText(d1.n);
-                e.setText(person+""+d1.d);
+                String z=person;
+                if(z.contains("!"))
+                    z=z.replace('!','.');
+                e.setText(z+""+d1.d);
                 s.setText(d1.s);
                 Glide.with(getApplicationContext()).load(d1.l).into(imv);
                 send=person+""+d1.d+"&"+d1.n;

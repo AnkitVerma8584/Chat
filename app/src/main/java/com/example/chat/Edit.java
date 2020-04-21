@@ -67,7 +67,12 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
                 progress.show();
                 for(DataSnapshot d:dataSnapshot.getChildren()) {
                     Details det=d.getValue(Details.class);
-                    if(d.getKey().equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
+                    String z1=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
+                    if(z1.contains("."))
+                    {
+                        z1=z1.replace('.','!');
+                    }
+                    if(d.getKey().equals(z1))
                     {
                         u.setText(det.n);
                         s.setText(det.s);
@@ -121,8 +126,13 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
     {
         try {
             if (imageuri != null) {
-                final StorageReference user_profile = mStorageRef.child( auth.getCurrentUser().getEmail()
-                        .substring(0,auth.getCurrentUser().getEmail().indexOf('@'))+".jpg");
+                String z1=auth.getCurrentUser().getEmail()
+                        .substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
+                if(z1.contains("."))
+                {
+                    z1=z1.replace('.','!');
+                }
+                final StorageReference user_profile = mStorageRef.child( z1+".jpg");
                 progress.setTitle("Uploading...");
                 progress.show();
                 progress.setCancelable(false);
@@ -139,7 +149,10 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
 
                                         String img_url = uri.toString();// to store url of the image
                                         Details d=new Details(name,status,img_url,domain);
-                                        db.child(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))).setValue(d);
+                                        String z2=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
+                                        if(z2.contains("."))
+                                            z2=z2.replace('.','!');
+                                        db.child(z2).setValue(d);
                                         Toast.makeText(getApplicationContext(),"Details Saved",Toast.LENGTH_SHORT).show();
                                         progress.dismiss();
                                         finish();
@@ -157,7 +170,10 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
                         });
             } else {
                 Details d=new Details(name,status,durl,domain);
-                db.child(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))).setValue(d);
+                String z2=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
+                if(z2.contains("."))
+                    z2=z2.replace('.','!');
+                db.child(z2).setValue(d);
                 Toast.makeText(getApplicationContext(),"Details Saved",Toast.LENGTH_SHORT).show();
                 finish();
                 startActivity(new Intent(getApplicationContext(),Login.class));

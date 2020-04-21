@@ -73,10 +73,13 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT));
                         Button b=new Button(getApplicationContext());
                         CircleImageView civ=new CircleImageView(getApplicationContext());
-                        if(u.contains(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
+                        String zz=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
+                        if(zz.contains("."))
+                            zz=zz.replace('.','!');
+                        if(u.contains(zz))
                         {
                             String t1=u.substring(0,u.indexOf('^')),t2=u.substring(u.indexOf('^')+1);
-                            if(t1.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
+                            if(t1.equals(zz))
                             {
                                 getname(t2,c);
                                 Drawable bac=getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
@@ -89,7 +92,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                                 tr.addView(civ);
                                 tr.addView(b);
                             }
-                            else if(t2.equals(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'))))
+                            else if(t2.equals(zz))
                             {
                                 getname(t1,c);
                                 Drawable bac=getApplicationContext().getResources().getDrawable(R.drawable.chatbox);

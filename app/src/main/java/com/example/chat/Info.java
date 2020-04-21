@@ -38,6 +38,7 @@ public class Info extends AppCompatActivity implements View.OnClickListener {
     private Uri imageuri;
     String domain;
     ProgressDialog progress;
+    String z1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,8 +47,13 @@ public class Info extends AppCompatActivity implements View.OnClickListener {
         domain=auth.getCurrentUser().getEmail().substring(auth.getCurrentUser().getEmail().indexOf('@'));
         n=findViewById(R.id.name);
         s=findViewById(R.id.status);
+        z1=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
+        if(z1.contains("."))
+        {
+            z1=z1.replace('.','!');
+        }
         db= FirebaseDatabase.getInstance().getReference().child("Users")
-                .child(auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@')));
+                .child(z1);
         bt=findViewById(R.id.save);
         bt.setOnClickListener(this);
         mStorageRef = FirebaseStorage.getInstance().getReference();

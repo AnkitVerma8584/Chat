@@ -75,6 +75,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         getSupportActionBar().setTitle(t1);
         t=findViewById(R.id.table);
         a=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
+        if(a.contains("."))
+            a=a.replace('.','!');
         chatbase(a,p);
         b=findViewById(R.id.button2);
         b.setOnClickListener(this);
