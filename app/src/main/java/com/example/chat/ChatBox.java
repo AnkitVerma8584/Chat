@@ -8,8 +8,9 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -147,7 +148,10 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         Button b=findViewById(t);
                         b.setTextColor(Color.BLACK);
                         b.setTransformationMethod(null);
-                        b.setText(u.n+"\t"+" ("+d1.getKey()+u.d+") "+"\n"+u.s);
+                        String s1=u.n+"\t"+" ("+d1.getKey()+u.d+") "+"\n"+u.s;
+                        SpannableString spannableString=new SpannableString(s1);
+                        spannableString.setSpan(new ForegroundColorSpan(Color.WHITE),s1.indexOf('('),s1.indexOf(')')+1,0);
+                        b.setText(spannableString);
                         b.setLeft(10);
                         b.setTextSize(18);
                     }
@@ -274,8 +278,6 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                     }
                 });
             } catch (Exception e) {
-                /*finish();
-                startActivity(new Intent(getApplicationContext(),ChatBox.class));*/
                 Toast.makeText(getApplicationContext(),"Picture changed",Toast.LENGTH_SHORT).show();
                 start();
             }

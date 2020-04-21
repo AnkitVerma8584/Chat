@@ -74,6 +74,11 @@ public class Info extends AppCompatActivity implements View.OnClickListener {
                 Toast.makeText(getApplicationContext(), "Status cannot be blank", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if(name.contains("!") || name.contains("@") || name.contains("#") || name.contains("$") || name.contains("%") || name.contains("^") || name.contains("&") || name.contains("(") || name.contains(")") || name.contains("*"))
+            {
+                Toast.makeText(getApplicationContext(), "Name cannot contain special characters '!','@','#','%','^','&','*','(' and ')'", Toast.LENGTH_SHORT).show();
+                return;
+            }
             storeimage();
         }
         if(v==profile){

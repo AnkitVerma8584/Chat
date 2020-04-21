@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -61,7 +62,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     Button b;
     EditText text;
     ScrollView scr;
-    int c=0,fl=1;
+    int c=0,fl=1,bl=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +85,16 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.chat_menu,menu);
+        return true;
+    }
+
+    @Override
+    protected boolean onPrepareOptionsPanel(View view, Menu menu) {
+        MenuItem item=menu.findItem(R.id.item6);
+        if(bl==1)
+            item.setTitle("Unblock");
+        else if(bl==0)
+            item.setTitle("Block");
         return true;
     }
 
@@ -156,9 +167,13 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                         else if(u.email.equals("Block"))
                         {
                             fl=fl*0;
+                            if(ds1.getKey().equals(a+"\\"+"BLOCK"))
+                                bl=1;
                         }
                         else if(u.email.equals("Unblock")){
                             fl=fl*1;
+                            if(ds1.getKey().equals(a+"\\"+"BLOCK"))
+                                bl=0;
                         }
                     } catch (NullPointerException npe) {
                     }
@@ -169,6 +184,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                         scr.fullScroll(View.FOCUS_DOWN);
                     }
                 });
+                invalidateOptionsMenu();
             }
 
             @Override
@@ -235,8 +251,10 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.item4:
+                Intent intent=new Intent(getApplicationContext(),ProfilePerson.class);
+                intent.putExtra("Email",p);
                 finish();
-                startActivity(new Intent(getApplicationContext(),ProfilePerson.class));
+                startActivity(intent);
                 return true;
             case R.id.item5:
                 return true;
@@ -253,6 +271,10 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                     Toast.makeText(getApplicationContext(), "Unblocked", Toast.LENGTH_SHORT).show();
                     item.setTitle("Block");
                 }
+                if(bl==1)
+                    item.setTitle("Unblock");
+                else if(bl==0)
+                    item.setTitle("Block");
                 return true;
         }
         return super.onOptionsItemSelected(item);
