@@ -42,7 +42,12 @@ public class NewChat extends AppCompatDialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         try {
                             String name = txt.getText().toString().substring(0, txt.getText().toString().indexOf('@'));
-                            if (name.equals(auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@')))) {
+                            if(name.contains("."))
+                                name=name.replace('.','!');
+                            String z=auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
+                            if(z.contains("."))
+                                z=z.replace('.','!');
+                            if (name.equals(z)) {
                                 Toast.makeText(getContext(), "You cannot message yourself", Toast.LENGTH_SHORT).show();
                                 return;
                             } else {
