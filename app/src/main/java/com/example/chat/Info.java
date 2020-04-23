@@ -124,8 +124,11 @@ public class Info extends AppCompatActivity implements View.OnClickListener {
     void storeimage() {     //To store the pic
         try {
             if (imageuri != null) {
-                final StorageReference user_profile = mStorageRef.child( auth.getCurrentUser().getEmail()
-                        .substring(0,auth.getCurrentUser().getEmail().indexOf('@'))+".jpg");
+                String z2=auth.getCurrentUser().getEmail()
+                        .substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
+                if(z2.contains("."))
+                    z2=z2.replace('.','!');
+                final StorageReference user_profile = mStorageRef.child(z2+".jpg");
                 progress.setTitle("Uploading...");
                 progress.show();
                 progress.setCancelable(false);

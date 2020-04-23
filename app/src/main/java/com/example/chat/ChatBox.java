@@ -4,6 +4,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
@@ -69,6 +70,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                     c=100;
                     for(DataSnapshot d1 : dataSnapshot.getChildren())  {
                         u=d1.getKey();
+                        User ch=d1.getValue(User.class);
                         final TableRow tr=new TableRow(getApplicationContext());
                         tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT));
                         Button b=new Button(getApplicationContext());
@@ -90,6 +92,15 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                                 civ.setId(100*c);
                                 c++;
                                 tr.addView(civ);
+                                try {
+                                    if(ch.email.contains(t2+"\\") && !ch.email.contains("*%SEEN%*"))
+                                    {
+                                        /*Drawable mm=getApplicationContext().getResources().getDrawable(R.drawable.ic_message_black_24dp);
+                                        b.setCompoundDrawables(null,null,mm,null);
+                                        b.setCompoundDrawablePadding(5);*/
+                                    }
+                                } catch (Exception e) {
+                                }
                                 tr.addView(b);
                             }
                             else if(t2.equals(zz))
@@ -103,6 +114,16 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                                 civ.setId(100*c);
                                 c++;
                                 tr.addView(civ);
+                                try {
+                                    if(ch.email.contains(t1+"\\") && !ch.email.contains("*%SEEN%*"))
+                                    {
+                                        /*Drawable mm=getApplicationContext().getResources().getDrawable(R.drawable.ic_message_black_24dp);
+                                        b.setCompoundDrawables(null,null,mm,null);
+                                        b.setCompoundDrawablePadding(5);*/
+
+                                    }
+                                } catch (Exception e) {
+                                }
                                 tr.addView(b);
                             }
                         }

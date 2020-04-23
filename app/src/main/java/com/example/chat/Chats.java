@@ -7,8 +7,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.ClipData;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -62,7 +64,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     Button b;
     EditText text;
     ScrollView scr;
-    int c=0,fl=1,bl=0;
+    int c=0,fl=1,bl=0,f=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,14 +146,29 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                             if (u.email.contains(a + "\\")) {
                                 String z = (u.email.substring(u.email.indexOf('\\') + 1));
                                 LayoutInflater inflater = getLayoutInflater();
-                                View v = inflater.inflate(R.layout.right_chat, null);
-                                TextView tvt = v.findViewById(R.id.r_message);
-                                if (z.indexOf('$') > -1)
-                                    tvt.setText(z.substring(0, z.indexOf('$')));
-                                else
-                                    tvt.setText(z);
+
+                                if(!u.email.contains("*%SEEN%*"))
+                                {
+
+                                    View v = inflater.inflate(R.layout.right_chat, null);
+                                    TextView tvt = v.findViewById(R.id.r_message);
+                                    if (z.indexOf('$') > -1)
+                                        tvt.setText(z.substring(0, z.indexOf('$')));
+                                    else
+                                        tvt.setText(z);
+                                    t.addView(v);
+                                }
+                                else{
+                                    View v = inflater.inflate(R.layout.seen, null);
+                                    TextView tvt = v.findViewById(R.id.r_message);
+                                    if (z.indexOf('$') > -1)
+                                        tvt.setText(z.substring(0, z.indexOf('$')));
+                                    else
+                                        tvt.setText(z);
+                                    t.addView(v);
+                                }
                                 c++;
-                                t.addView(v);
+
                             }
                             if (u.email.contains(p + "\\")) {
                                 String z = (u.email.substring(u.email.indexOf('\\') + 1));
@@ -163,7 +180,11 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                 else
                                     tvt.setText(z);
                                 c++;
+                                if(!u.email.contains("*%SEEN%*") && f==0) {
+                                    seen(u.email,ds1.getKey());
+                                }
                                 t.addView(v);
+
                             }
                         }
                         else if(u.email.equals("Block"))
@@ -195,7 +216,11 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             }
         });
     }
-
+    public void seen(String em,String k)
+    {
+        User b = new User(em + "*%SEEN%*");
+        db.child(k).setValue(b);
+    }
     public void addChat(String n) {
         if(c==0)
         {
@@ -224,6 +249,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     @Override
     public void onBackPressed() {
         finish();
+        f=1;
         startActivity(new Intent(getApplicationContext(),ChatBox.class));
     }
 
