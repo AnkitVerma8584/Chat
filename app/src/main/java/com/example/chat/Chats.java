@@ -142,7 +142,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                         final TableRow tr=new TableRow(getApplicationContext());
                         tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT,TableLayout.LayoutParams.WRAP_CONTENT));
                         tr.setGravity(Gravity.CENTER);
-                        if(!ds1.getKey().equals(a+"\\"+"BLOCK") && !ds1.getKey().equals(p+"\\"+"BLOCK")) {
+                        if(!ds1.getKey().equals(a+"\\"+"BLOCK") && !ds1.getKey().equals(p+"\\"+"BLOCK") && !ds1.getKey().equals("BLANK")) {
                             if (u.email.contains(a + "\\")) {
                                 String z = (u.email.substring(u.email.indexOf('\\') + 1));
                                 LayoutInflater inflater = getLayoutInflater();

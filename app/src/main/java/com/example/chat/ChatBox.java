@@ -10,7 +10,9 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.SpannableString;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,6 +35,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListener{
@@ -44,7 +50,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
     Display display;
     LoadingDialog loadingDialog=new LoadingDialog(ChatBox.this);
     ScrollView scr;
-    int fl=0;
+    int fl=0,unseen_message=0,first_time=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,19 +76,41 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                     c=100;
                     for(DataSnapshot d1 : dataSnapshot.getChildren())  {
                         u=d1.getKey();
-                        User ch=d1.getValue(User.class);
+                        if(first_time==0)
+                        {
+                            change(u);
+                        }
                         final TableRow tr=new TableRow(getApplicationContext());
                         tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT));
-                        Button b=new Button(getApplicationContext());
+                        final Button b=new Button(getApplicationContext());
                         CircleImageView civ=new CircleImageView(getApplicationContext());
                         String zz=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
                         if(zz.contains("."))
                             zz=zz.replace('.','!');
                         if(u.contains(zz))
                         {
-                            String t1=u.substring(0,u.indexOf('^')),t2=u.substring(u.indexOf('^')+1);
+                            final String t1=u.substring(0,u.indexOf('^')),t2=u.substring(u.indexOf('^')+1);
                             if(t1.equals(zz))
                             {
+                                db.child(u).addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
+                                        unseen_message=0;
+                                        for(DataSnapshot ds1:dataSnapshot2.getChildren())
+                                        {
+                                            User ch=ds1.getValue(User.class);
+                                            if(ch.email.contains(t2+"\\") && !ch.email.contains("*%SEEN%*"))
+                                            {
+                                                unseen_message++;
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
                                 getname(t2,c);
                                 Drawable bac=getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
                                 b.setBackground(bac);
@@ -92,19 +120,29 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                                 civ.setId(100*c);
                                 c++;
                                 tr.addView(civ);
-                                try {
-                                    if(ch.email.contains(t2+"\\") && !ch.email.contains("*%SEEN%*"))
-                                    {
-                                        /*Drawable mm=getApplicationContext().getResources().getDrawable(R.drawable.ic_message_black_24dp);
-                                        b.setCompoundDrawables(null,null,mm,null);
-                                        b.setCompoundDrawablePadding(5);*/
-                                    }
-                                } catch (Exception e) {
-                                }
                                 tr.addView(b);
                             }
                             else if(t2.equals(zz))
                             {
+                                db.child(u).addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
+                                        unseen_message=0;
+                                        for(DataSnapshot ds1:dataSnapshot2.getChildren())
+                                        {
+                                            User ch=ds1.getValue(User.class);
+                                            if(ch.email.contains(t1+"\\") && !ch.email.contains("*%SEEN%*"))
+                                            {
+                                                unseen_message++;
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
                                 getname(t1,c);
                                 Drawable bac=getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
                                 b.setBackground(bac);
@@ -114,21 +152,13 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                                 civ.setId(100*c);
                                 c++;
                                 tr.addView(civ);
-                                try {
-                                    if(ch.email.contains(t1+"\\") && !ch.email.contains("*%SEEN%*"))
-                                    {
-                                        /*Drawable mm=getApplicationContext().getResources().getDrawable(R.drawable.ic_message_black_24dp);
-                                        b.setCompoundDrawables(null,null,mm,null);
-                                        b.setCompoundDrawablePadding(5);*/
-
-                                    }
-                                } catch (Exception e) {
-                                }
                                 tr.addView(b);
                             }
                         }
                         t.addView(tr);
                     }
+                    if(first_time==0)
+                        first_time=1;
                     loadingDialog.dismissDialog();
                     try {
                         checkClick();
@@ -146,6 +176,13 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         }
     }
 
+    public void change(String uu)
+    {
+        String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+        String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+        User ue=new User(uu+currentDate+currentTime);
+        db.child(uu).child("BLANK").setValue(ue);
+    }
     public void getname(final String n,final int t)
     {
         df.addValueEventListener(new ValueEventListener() {
@@ -172,9 +209,13 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         Button b=findViewById(t);
                         b.setTextColor(Color.BLACK);
                         b.setTransformationMethod(null);
-                        String s1=u.n+"\t"+" ("+d1.getKey()+u.d+") "+"\n"+u.s;
+                        String s1=u.n+"\t"+" (%"+unseen_message+"&"+d1.getKey()+u.d+") "+"\n"+u.s;
                         SpannableString spannableString=new SpannableString(s1);
                         spannableString.setSpan(new ForegroundColorSpan(Color.WHITE),s1.indexOf('('),s1.indexOf(')')+1,0);
+                        if(unseen_message>0) {
+                            spannableString.setSpan(new ForegroundColorSpan(Color.BLACK), s1.indexOf('%') + 1, s1.indexOf('&'), 0);
+                            spannableString.setSpan(new BackgroundColorSpan(Color.GREEN), s1.indexOf('%') + 1, s1.indexOf('&'), 0);
+                        }
                         b.setText(spannableString);
                         b.setLeft(10);
                         b.setTextSize(18);
@@ -192,7 +233,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
     public void getEmail(final String n)
     {
         Intent Int=new Intent(getApplicationContext(),Chats.class);
-        Int.putExtra("person",""+n.substring(n.indexOf('(')+1,n.indexOf(')'))+"&"+n.substring(0,n.indexOf('(')-1));
+        Int.putExtra("person",""+n.substring(n.indexOf('&')+1,n.indexOf(')'))+"&"+n.substring(0,n.indexOf('(')-1));
         finish();
         startActivity(Int);
     }
