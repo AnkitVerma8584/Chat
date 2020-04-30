@@ -314,7 +314,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         String n=b.getText().toString();
                         scr.setBackgroundColor(Color.BLACK);
                         fl=1;
-                        final String file=n.substring(n.indexOf('(')+1,n.indexOf('@'));
+                        final String file=n.substring(n.indexOf('&')+1,n.indexOf('@'));
                         txt.setText(n.substring(0,n.indexOf('(')-1));
                         df.addValueEventListener(new ValueEventListener() {
                             @Override
