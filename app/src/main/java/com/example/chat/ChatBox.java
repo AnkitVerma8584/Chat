@@ -43,16 +43,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListener{
     FirebaseAuth auth;
-    DatabaseReference db,df;
+    DatabaseReference db,df,dl;
     private TableLayout t;
     String u;
     int c=100;
     Display display;
+    String allname="",allnm="";
     LoadingDialog loadingDialog=new LoadingDialog(ChatBox.this);
     ScrollView scr;
     int fl=0,unseen_message=0,first_time=0;
-    String all="";
-    int count=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,15 +60,17 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         t = findViewById(R.id.table);
         db = FirebaseDatabase.getInstance().getReference().child("ChatBox");
         df = FirebaseDatabase.getInstance().getReference().child("Users");
+        dl = FirebaseDatabase.getInstance().getReference().child("Last");
         display = getWindowManager().getDefaultDisplay();
         scr = findViewById(R.id.full);
-        start();
+        //start();
+        begin();
     }
-    public void start(){
+    public void begin(){
         fl=0;
         try {
             loadingDialog.startLoadingDialog();
-            db.addValueEventListener(new ValueEventListener() {
+            dl.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     t.removeAllViews();
@@ -77,87 +78,247 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                     fl=0;
                     c=100;
                     for(DataSnapshot d1 : dataSnapshot.getChildren())  {
-                        u=d1.getKey();
-                        if(first_time==0)
-                        {
-                            change(u);
-                        }
-                        final TableRow tr=new TableRow(getApplicationContext());
-                        tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT));
-                        final Button b=new Button(getApplicationContext());
-                        CircleImageView civ=new CircleImageView(getApplicationContext());
-                        String zz=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
-                        if(zz.contains("."))
-                            zz=zz.replace('.','!');
-                        if(u.contains(zz))
-                        {
-                            final String t1=u.substring(0,u.indexOf('^')),t2=u.substring(u.indexOf('^')+1);
-                            if(t1.equals(zz))
-                            {
-                                db.child(u).addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
-                                        unseen_message=0;
-                                        for(DataSnapshot ds1:dataSnapshot2.getChildren())
-                                        {
-                                            User ch=ds1.getValue(User.class);
-                                            if(ch.email.contains(t2+"\\") && !ch.email.contains("*%SEEN%*"))
-                                            {
-                                                unseen_message++;
-                                            }
+                        User all=d1.getValue(User.class);
+                        u=all.email;
+                        //if(!allname.contains(u))
+                        //{
+                            String zz = auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
+                            if (zz.contains("."))
+                                zz = zz.replace('.', '!');
+                            if (u.contains(zz)) {
+                                final String t1 = u.substring(0, u.indexOf('^')), t2 = u.substring(u.indexOf('^') + 1);
+                                /*if (t1.equals(zz)) {
+                                    allnm=allnm+t2+"$";
+                                } else if (t2.equals(zz)) {
+                                    allnm=allnm+t1+"$";
+                                }*/
+                                allnm=allnm+u+"$";
+                            }
+                        //}
+
+                    }
+                    loadingDialog.dismissDialog();
+                    sort(allnm);
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
+        }
+    }
+    public void sort(String n)
+    {
+        int p=0;
+        for(int i=0;i<n.length();i++)
+            if(n.charAt(i)=='$')
+                p++;
+        String name[]=new String[p];
+        String t="";int nc=p-1;
+        for(int i=0;i<n.length();i++)
+        {
+            if(n.charAt(i)=='$')
+            {
+                name[nc--]=t;
+                t="";
+            }
+            else
+                t=t+n.charAt(i);
+        }
+        display(name);
+    }
+    public void display(String name[]){
+        fl=0;
+        allname="";
+        try {
+            loadingDialog.startLoadingDialog();
+            t.removeAllViews();
+            scr.setBackgroundColor(Color.WHITE);
+            fl=0;
+            c=100;
+            for(int i=0;i<name.length;i++){
+                u=name[i];
+                unseen_message = 0;
+                //Toast.makeText(getApplicationContext(),u,Toast.LENGTH_SHORT).show();
+                if(!allname.contains(u))
+                {
+                    if (first_time == 0) {
+                        String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+                        String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+                        User ue=new User(u+"$"+currentDate+"#"+currentTime);
+                        db.child(u).child("BLANK").setValue(ue);
+                    }
+                    final TableRow tr = new TableRow(getApplicationContext());
+                    tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+                    final Button b = new Button(getApplicationContext());
+                    CircleImageView civ = new CircleImageView(getApplicationContext());
+                    String zz = auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
+                    if (zz.contains("."))
+                        zz = zz.replace('.', '!');
+                    if (u.contains(zz)) {
+                        final String t1 = u.substring(0, u.indexOf('^')), t2 = u.substring(u.indexOf('^') + 1);
+                        if (t1.equals(zz)) {
+                            db.child(u).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
+                                    unseen_message = 0;
+                                    for (DataSnapshot ds1 : dataSnapshot2.getChildren()) {
+                                        User ch = ds1.getValue(User.class);
+                                        if (ch.email.contains(t2 + "\\") && !ch.email.contains("*%SEEN%*")) {
+                                            unseen_message++;
                                         }
                                     }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-                                getname(t2,c);
-                                Drawable bac=getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
-                                b.setBackground(bac);
-                                b.setPadding(15,5,25000,10);
-                                b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-                                b.setId(c);
-                                civ.setId(100*c);
-                                c++;
-                                tr.addView(civ);
-                                tr.addView(b);
-                            }
-                            else if(t2.equals(zz))
-                            {
-                                db.child(u).addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
-                                        unseen_message=0;
-                                        for(DataSnapshot ds1:dataSnapshot2.getChildren())
-                                        {
-                                            User ch=ds1.getValue(User.class);
-                                            if(ch.email.contains(t1+"\\") && !ch.email.contains("*%SEEN%*"))
-                                            {
-                                                unseen_message++;
-                                            }
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        }
+                                    });
+                            getname(t2, c);
+                            Drawable bac = getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
+                            b.setBackground(bac);
+                            b.setPadding(15, 5, 25000, 10);
+                            b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                            b.setId(c);
+                            civ.setId(100 * c);
+                            c++;
+                            tr.addView(civ);
+                            tr.addView(b);
+                        } else if (t2.equals(zz)) {
+                            db.child(u).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
+                                    unseen_message = 0;
+                                    for (DataSnapshot ds1 : dataSnapshot2.getChildren()) {
+                                        User ch = ds1.getValue(User.class);
+                                        if (ch.email.contains(t1 + "\\") && !ch.email.contains("*%SEEN%*")) {
+                                            unseen_message++;
                                         }
                                     }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-                                getname(t1,c);
-                                Drawable bac=getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
-                                b.setBackground(bac);
-                                b.setPadding(15,5,25000,10);
-                                b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-                                b.setId(c);
-                                civ.setId(100*c);
-                                c++;
-                                tr.addView(civ);
-                                tr.addView(b);
-                            }
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        }
+                                    });
+                            getname(t1, c);
+                            Drawable bac = getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
+                            b.setBackground(bac);
+                            b.setPadding(15, 5, 25000, 10);
+                            b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                            b.setId(c);
+                            civ.setId(100 * c);
+                            c++;
+                            tr.addView(civ);
+                            tr.addView(b);
                         }
-                        t.addView(tr);
+                    }
+                    t.addView(tr);
+                    allname=allname+u;
+                }
+            }
+            if(first_time==0)
+                first_time=1;
+            loadingDialog.dismissDialog();
+            try {
+                checkClick();
+                checkImClick();
+            } catch (Exception e) {
+            }
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
+        }
+    }
+    /*public void start(){
+        fl=0;
+        try {
+            loadingDialog.startLoadingDialog();
+            dl.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    t.removeAllViews();
+                    scr.setBackgroundColor(Color.WHITE);
+                    fl=0;
+                    c=100;
+                    for(DataSnapshot d1 : dataSnapshot.getChildren())  {
+                        User all=d1.getValue(User.class);
+                        u=all.email;
+                        if(!allname.contains(u))
+                        {
+                            if (first_time == 0) {
+                                change(u);
+                            }
+                            final TableRow tr = new TableRow(getApplicationContext());
+                            tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+                            final Button b = new Button(getApplicationContext());
+                            CircleImageView civ = new CircleImageView(getApplicationContext());
+                            String zz = auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
+                            if (zz.contains("."))
+                                zz = zz.replace('.', '!');
+                            if (u.contains(zz)) {
+                                final String t1 = u.substring(0, u.indexOf('^')), t2 = u.substring(u.indexOf('^') + 1);
+                                if (t1.equals(zz)) {
+                                    db.child(u).addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
+                                            unseen_message = 0;
+                                            for (DataSnapshot ds1 : dataSnapshot2.getChildren()) {
+                                                User ch = ds1.getValue(User.class);
+                                                if (ch.email.contains(t2 + "\\") && !ch.email.contains("*%SEEN%*")) {
+                                                    unseen_message++;
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                    getname(t2, c);
+                                    Drawable bac = getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
+                                    b.setBackground(bac);
+                                    b.setPadding(15, 5, 25000, 10);
+                                    b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                                    b.setId(c);
+                                    civ.setId(100 * c);
+                                    c++;
+                                    tr.addView(civ);
+                                    tr.addView(b);
+                                } else if (t2.equals(zz)) {
+                                    db.child(u).addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
+                                            unseen_message = 0;
+                                            for (DataSnapshot ds1 : dataSnapshot2.getChildren()) {
+                                                User ch = ds1.getValue(User.class);
+                                                if (ch.email.contains(t1 + "\\") && !ch.email.contains("*%SEEN%*")) {
+                                                    unseen_message++;
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                    getname(t1, c);
+                                    Drawable bac = getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
+                                    b.setBackground(bac);
+                                    b.setPadding(15, 5, 25000, 10);
+                                    b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                                    b.setId(c);
+                                    civ.setId(100 * c);
+                                    c++;
+                                    tr.addView(civ);
+                                    tr.addView(b);
+                                }
+                            }
+                            t.addView(tr);
+                            allname=allname+u;
+                        }
+
                     }
                     if(first_time==0)
                         first_time=1;
@@ -183,7 +344,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
         User ue=new User(uu+"$"+currentDate+"#"+currentTime);
         db.child(uu).child("BLANK").setValue(ue);
-    }
+    }*/
     public void getname(final String n,final int t)
     {
         df.addValueEventListener(new ValueEventListener() {
@@ -197,8 +358,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         try {
                             Glide.with(getApplicationContext()).load(u.l).into(civ);
                         } catch (Exception e) {
-                            finish();
-                            startActivity(new Intent(getApplicationContext(),ChatBox.class));
+                            begin();
                         }
                         Point size=new Point();
                         display.getSize(size);
@@ -217,6 +377,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                             spannableString.setSpan(new ForegroundColorSpan(Color.BLACK), s1.indexOf('%') + 1, s1.indexOf('&'), 0);
                             spannableString.setSpan(new BackgroundColorSpan(Color.GREEN), s1.indexOf('%') + 1, s1.indexOf('&'), 0);
                         }
+                        unseen_message=0;
                         b.setText(spannableString);
                         b.setLeft(10);
                         b.setTextSize(18);
@@ -235,7 +396,6 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
     {
         Intent Int=new Intent(getApplicationContext(),Chats.class);
         Int.putExtra("person",""+n.substring(n.indexOf('&')+1,n.indexOf(')'))+"&"+n.substring(0,n.indexOf('(')-1));
-        finish();
         startActivity(Int);
     }
 
@@ -337,14 +497,16 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         txt.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                start();
+                                //start();
+                                begin();
                             }
                         });
                     }
                 });
             } catch (Exception e) {
                 Toast.makeText(getApplicationContext(),"Picture changed",Toast.LENGTH_SHORT).show();
-                start();
+                //start();
+                begin();
             }
 
         }
@@ -386,7 +548,8 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
             finishAffinity();
         }
         else if(fl==1){
-            start();
+            //start();
+            begin();
         }
 
     }

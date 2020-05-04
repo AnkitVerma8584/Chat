@@ -1,35 +1,14 @@
 package com.example.chat;
 
-import androidx.annotation.ColorRes;
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
-import android.content.ClipData;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.BackgroundColorSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.SubscriptSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
@@ -45,20 +24,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import static android.graphics.Color.BLUE;
-import static android.graphics.Color.YELLOW;
-
 public class Chats extends AppCompatActivity implements View.OnClickListener {
     String p,a;
-    DatabaseReference db;
+    DatabaseReference db,ud;
     FirebaseAuth auth;
     TableLayout t;
     Button b;
@@ -84,6 +55,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         b.setOnClickListener(this);
         text=findViewById(R.id.editText3);
         scr=findViewById(R.id.scrollView2);
+        ud=FirebaseDatabase.getInstance().getReference().child("Last");
     }
 
     @Override
@@ -244,10 +216,34 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             db.push().setValue(u);
             User u2=new User(""+currentDate+"%"+currentTime);
             db.child("LAST").setValue(u2);
+            u=new User(commonChatBoxName(a,p));
+            ud.child(""+currentDate + "*" + currentTime).setValue(u);
             viewChat();
         }
     }
-
+    public String commonChatBoxName(String a1,String p1){
+        int i=0;String n="";
+        while(i<a1.length() && i<p1.length())
+        {
+            if((int)(a1.charAt(i))<(int)(p1.charAt(i)))
+            {
+                n=""+(a1+"^"+p1);
+                break;
+            }
+            else if((int)(a1.charAt(i))>(int)(p1.charAt(i)))
+            {
+                n=""+(p1+"^"+a1);
+                break;
+            }else{
+                if(a1.length()<p1.length())
+                    n=""+(a1+"^"+p1);
+                else
+                    n=""+(p1+"^"+a1);
+            }
+            i++;
+        }
+        return n;
+    }
     @Override
     public void onBackPressed() {
         finish();
