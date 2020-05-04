@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,7 +42,7 @@ import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListener{
+public class ChatBox extends AppCompatActivity implements NewChat.NewChatListener, View.OnClickListener {
     FirebaseAuth auth;
     DatabaseReference db,df,dl;
     private TableLayout t;
@@ -52,6 +53,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
     LoadingDialog loadingDialog=new LoadingDialog(ChatBox.this);
     ScrollView scr;
     int fl=0,unseen_message=0,first_time=0;
+    FloatingActionButton flab;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +65,8 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         dl = FirebaseDatabase.getInstance().getReference().child("Last");
         display = getWindowManager().getDefaultDisplay();
         scr = findViewById(R.id.full);
+        flab=findViewById(R.id.fab);
+        flab.setOnClickListener(this);
         //start();
         begin();
     }
@@ -145,10 +149,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                 if(!allname.contains(u))
                 {
                     if (first_time == 0) {
-                        String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-                        String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-                        User ue=new User(u+"$"+currentDate+"#"+currentTime);
-                        db.child(u).child("BLANK").setValue(ue);
+                        change(u);
                     }
                     final TableRow tr = new TableRow(getApplicationContext());
                     tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
@@ -337,14 +338,14 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
         }
-    }
+    }*/
     public void change(String uu)
     {
         String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
         String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
         User ue=new User(uu+"$"+currentDate+"#"+currentTime);
         db.child(uu).child("BLANK").setValue(ue);
-    }*/
+    }
     public void getname(final String n,final int t)
     {
         df.addValueEventListener(new ValueEventListener() {
@@ -529,7 +530,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                     if(n.equals(d1.getKey()))
                     {
                         Int.putExtra("person",n+u.d+"&"+u.n);
-                        finish();
+                        //finish();
                         startActivity(Int);
                     }
                 }
@@ -552,5 +553,14 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
             begin();
         }
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v==flab)
+        {
+            //finish();
+            startActivity(new Intent(getApplicationContext(),MorePeople.class));
+        }
     }
 }

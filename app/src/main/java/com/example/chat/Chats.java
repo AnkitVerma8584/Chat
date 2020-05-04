@@ -4,6 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Layout;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.AlignmentSpan;
+import android.text.style.RelativeSizeSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -125,7 +130,17 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                     View v = inflater.inflate(R.layout.right_chat, null);
                                     TextView tvt = v.findViewById(R.id.r_message);
                                     if (z.indexOf('$') > -1)
-                                        tvt.setText(z.substring(0, z.indexOf('$')));
+                                    {
+                                        String p;
+                                        if(z.contains("*%SEEN%*"))
+                                            p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1,z.lastIndexOf('*')-7);
+                                        else
+                                            p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1);
+                                        SpannableString spannableString=new SpannableString(p);
+                                        spannableString.setSpan(new RelativeSizeSpan(0.6f),p.indexOf(':')-2,p.length(),0);
+                                        spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':')-2,p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        tvt.setText(spannableString);
+                                    }
                                     else
                                         tvt.setText(z);
                                     t.addView(v);
@@ -133,10 +148,21 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                 else{
                                     View v = inflater.inflate(R.layout.seen, null);
                                     TextView tvt = v.findViewById(R.id.r_message);
-                                    if (z.indexOf('$') > -1)
-                                        tvt.setText(z.substring(0, z.indexOf('$')));
+                                    if (z.indexOf('$') > -1){
+                                        String p;
+                                        if(z.contains("*%SEEN%*"))
+                                            p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1,z.lastIndexOf('*')-7);
+                                        else
+                                            p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1);
+                                        SpannableString spannableString=new SpannableString(p);
+                                        spannableString.setSpan(new RelativeSizeSpan(0.6f),p.indexOf(':')-2,p.length(),0);
+                                        spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':')-2,p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        tvt.setText(spannableString);
+                                    }
                                     else
+                                    {
                                         tvt.setText(z);
+                                    }
                                     t.addView(v);
                                 }
                                 c++;
@@ -148,9 +174,21 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                 View v = inflater.inflate(R.layout.left_chat, null);
                                 TextView tvt = v.findViewById(R.id.l_message);
                                 if (z.indexOf('$') > -1)
-                                    tvt.setText(z.substring(0, z.indexOf('$')));
+                                {
+                                    String p;
+                                    if(z.contains("*%SEEN%*"))
+                                        p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1,z.lastIndexOf('*')-7);
+                                    else
+                                        p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1);
+                                    SpannableString spannableString=new SpannableString(p);
+                                    spannableString.setSpan(new RelativeSizeSpan(0.6f),p.indexOf(':')-2,p.length(),0);
+                                    spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':')-2,p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    tvt.setText(spannableString);
+                                }
                                 else
+                                {
                                     tvt.setText(z);
+                                }
                                 c++;
                                 if(!u.email.contains("*%SEEN%*") && f==0) {
                                     seen(u.email,ds1.getKey());
@@ -201,7 +239,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             db.child(p+"\\"+"BLOCK").setValue(b);
         }
         String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-        String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+        String currentTime = new SimpleDateFormat("hh:mm aa", Locale.getDefault()).format(new Date());
+        String currentTime2 = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
         if(n.contains("^BLOCK^")) {
             User b = new User("Block");
             db.child(a+"\\"+"BLOCK").setValue(b);
@@ -217,7 +256,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             User u2=new User(""+currentDate+"%"+currentTime);
             db.child("LAST").setValue(u2);
             u=new User(commonChatBoxName(a,p));
-            ud.child(""+currentDate + "*" + currentTime).setValue(u);
+            ud.child(""+currentDate + "*" + currentTime2).setValue(u);
             viewChat();
         }
     }
