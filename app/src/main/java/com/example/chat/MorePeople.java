@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -48,6 +49,7 @@ public class MorePeople extends AppCompatActivity {
     ScrollView scr;
     int fl=0;
     Details details;
+    FloatingActionButton flab;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +61,8 @@ public class MorePeople extends AppCompatActivity {
         dl = FirebaseDatabase.getInstance().getReference().child("Last");
         display = getWindowManager().getDefaultDisplay();
         scr = findViewById(R.id.full);
+        flab=findViewById(R.id.fab);
+        flab.setVisibility(View.INVISIBLE);
         start();
     }
     public void start(){
