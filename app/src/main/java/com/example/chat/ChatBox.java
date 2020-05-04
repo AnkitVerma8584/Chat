@@ -51,16 +51,18 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
     LoadingDialog loadingDialog=new LoadingDialog(ChatBox.this);
     ScrollView scr;
     int fl=0,unseen_message=0,first_time=0;
+    String all="";
+    int count=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_box);
-        auth=FirebaseAuth.getInstance();
-        t=findViewById(R.id.table);
-        db= FirebaseDatabase.getInstance().getReference().child("ChatBox");
-        df=FirebaseDatabase.getInstance().getReference().child("Users");
-        display=getWindowManager().getDefaultDisplay();
-        scr=findViewById(R.id.full);
+        auth = FirebaseAuth.getInstance();
+        t = findViewById(R.id.table);
+        db = FirebaseDatabase.getInstance().getReference().child("ChatBox");
+        df = FirebaseDatabase.getInstance().getReference().child("Users");
+        display = getWindowManager().getDefaultDisplay();
+        scr = findViewById(R.id.full);
         start();
     }
     public void start(){
@@ -175,12 +177,11 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
             Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
         }
     }
-
     public void change(String uu)
     {
         String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
         String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-        User ue=new User(uu+currentDate+currentTime);
+        User ue=new User(uu+"$"+currentDate+"#"+currentTime);
         db.child(uu).child("BLANK").setValue(ue);
     }
     public void getname(final String n,final int t)
@@ -336,8 +337,7 @@ public class ChatBox extends AppCompatActivity implements  NewChat.NewChatListen
                         txt.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                finish();
-                                startActivity(new Intent(getApplicationContext(),ChatBox.class));
+                                start();
                             }
                         });
                     }
