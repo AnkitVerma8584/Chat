@@ -18,7 +18,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,6 +45,7 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
     String durl;
     ProgressDialog progress;
     String name,status,domain;
+    TextView res;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +54,9 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
         u=findViewById(R.id.name);
         s=findViewById(R.id.status);
         b=findViewById(R.id.save);
+        res=findViewById(R.id.resetPass);
+        res.setVisibility(View.VISIBLE);
+        res.setOnClickListener(this);
         b.setOnClickListener(this);
         profile=findViewById(R.id.profilepic);
         progress=new ProgressDialog(this);
@@ -119,6 +125,25 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
             startActivityForResult(Intent.createChooser(intent,"Select a picture"),PICK_IMAGE);
+        }
+        if(v==res){
+            res.setVisibility(View.INVISIBLE);
+            String forgetPasswordEmail=auth.getCurrentUser().getEmail().toString();
+            auth.sendPasswordResetEmail(forgetPasswordEmail)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful())
+                            {
+                                Toast.makeText(getApplicationContext(),"Reset Password link sent to your email.",Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                res.setVisibility(View.VISIBLE);
+                                Toast.makeText(getApplicationContext(),task.getException().getMessage(),Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+                    });
         }
     }
 

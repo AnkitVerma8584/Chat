@@ -3,6 +3,7 @@ package com.example.chat;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
@@ -20,6 +21,8 @@ public class Default extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_default);
         getSupportActionBar().hide();
+        MediaPlayer ring= MediaPlayer.create(getApplicationContext(),R.raw.home);
+        ring.start();
         timer=new Timer();
         timer.schedule(new TimerTask() {
             @Override

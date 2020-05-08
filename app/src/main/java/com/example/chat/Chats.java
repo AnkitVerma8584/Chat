@@ -3,6 +3,7 @@ package com.example.chat;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.Layout;
 import android.text.Spannable;
@@ -22,6 +23,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -253,6 +255,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             n = n + "$" + currentDate + "#" + currentTime;
             User u = new User(n);
             db.push().setValue(u);
+            MediaPlayer ring= MediaPlayer.create(getApplicationContext(),R.raw.sent);
+            ring.start();
             User u2=new User(""+currentDate+"%"+currentTime);
             db.child("LAST").setValue(u2);
             u=new User(commonChatBoxName(a,p));
@@ -322,6 +326,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                 startActivity(intent);
                 return true;
             case R.id.item5:
+                Snackbar.make(findViewById(R.id.scrollView2), "Delete Chats will be available in next Update", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
                 return true;
             case R.id.item6:
                 if(item.getTitle().equals("Block")) {

@@ -54,6 +54,7 @@ public class MorePeople extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_box);
+        getSupportActionBar().setTitle("Chatable: Registered People");
         auth = FirebaseAuth.getInstance();
         t = findViewById(R.id.table);
         db = FirebaseDatabase.getInstance().getReference().child("ChatBox");
@@ -208,7 +209,10 @@ public class MorePeople extends AppCompatActivity {
                         String n=b.getText().toString();
                         scr.setBackgroundColor(Color.BLACK);
                         fl=1;
-                        final String file=n.substring(n.indexOf('\n')+1,n.indexOf('@'));
+                        String file1=n.substring(n.indexOf('\n')+1,n.indexOf('@'));
+                        if(file1.contains("."))
+                            file1= file1.replace('.','!');
+                        final String file=file1;
                         txt.setText(n.substring(0,n.indexOf('(')-1));
                         df.addValueEventListener(new ValueEventListener() {
                             @Override

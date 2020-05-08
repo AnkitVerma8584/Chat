@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -85,9 +86,25 @@ public class Registration extends AppCompatActivity implements View.OnClickListe
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             pd.dismiss();
                             if(task.isSuccessful()){
-                                Toast.makeText(getApplicationContext(),"Registration successful",Toast.LENGTH_SHORT).show();
-                                finish();
-                                startActivity(new Intent(getApplicationContext(),Info.class));
+                                auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()){
+                                            Toast.makeText(getApplicationContext(), "New Account Created. Please Verify your email.", Toast.LENGTH_SHORT).show();
+                                            new Handler().postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    finish();
+                                                    startActivity(new Intent(getApplicationContext(),Login.class));
+                                                }
+                                            }, 500);
+                                        }
+                                        else
+                                        {
+                                            Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
                             }
                             else
                             {

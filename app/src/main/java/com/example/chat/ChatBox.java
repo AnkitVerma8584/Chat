@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
@@ -58,6 +59,12 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_box);
+        getSupportActionBar().setTitle("Chatable: Your Chats");
+        if(!FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
+            Toast.makeText(getApplicationContext(), "Please verify your email ID and login again.", Toast.LENGTH_SHORT).show();
+            finish();
+            startActivity(new Intent(getApplicationContext(), Home.class));
+        }
         auth = FirebaseAuth.getInstance();
         t = findViewById(R.id.table);
         db = FirebaseDatabase.getInstance().getReference().child("ChatBox");
@@ -72,6 +79,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
     }
     public void begin(){
         fl=0;
+        flab.setVisibility(View.VISIBLE);
         try {
             loadingDialog.startLoadingDialog();
             dl.addValueEventListener(new ValueEventListener() {
@@ -375,6 +383,8 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                         SpannableString spannableString=new SpannableString(s1);
                         spannableString.setSpan(new ForegroundColorSpan(Color.WHITE),s1.indexOf('('),s1.indexOf(')')+1,0);
                         if(unseen_message>0) {
+                            MediaPlayer ring= MediaPlayer.create(getApplicationContext(),R.raw.sent);
+                            ring.start();
                             spannableString.setSpan(new ForegroundColorSpan(Color.BLACK), s1.indexOf('%') + 1, s1.indexOf('&'), 0);
                             spannableString.setSpan(new BackgroundColorSpan(Color.GREEN), s1.indexOf('%') + 1, s1.indexOf('&'), 0);
                         }
@@ -439,6 +449,9 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                 finish();
                 startActivity(new Intent(getApplicationContext(),Edit.class));
                 return true;
+            case R.id.about:
+                finish();
+                startActivity(new Intent(getApplicationContext(),About.class));
             default:return super.onOptionsItemSelected(item);
         }
 
@@ -469,6 +482,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                 civ.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        flab.setVisibility(View.INVISIBLE);
                         LayoutInflater inflater=getLayoutInflater();
                         View view=inflater.inflate(R.layout.pic,null);
                         TextView txt=view.findViewById(R.id.txt);

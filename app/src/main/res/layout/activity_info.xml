@@ -4,8 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Info"
-    android:background="@drawable/back_login">
+    android:background="@drawable/back_login"
+    tools:context=".Info">
+
+    <TextView
+        android:id="@+id/resetPass"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Reset Password"
+        android:textColor="#000000"
+        android:textSize="15dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.927"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/name"
@@ -18,10 +32,10 @@
         android:background="@drawable/message"
         android:ems="10"
         android:hint="Username"
-        android:maxLength="15"
-        android:singleLine="true"
         android:inputType="textPersonName"
+        android:maxLength="15"
         android:padding="20dp"
+        android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView6" />
@@ -54,10 +68,10 @@
         android:background="@drawable/message"
         android:ems="10"
         android:hint="Status"
-        android:singleLine="true"
-        android:maxLength="25"
         android:inputType="textPersonName"
+        android:maxLength="25"
         android:padding="20dp"
+        android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.481"
         app:layout_constraintStart_toStartOf="parent"

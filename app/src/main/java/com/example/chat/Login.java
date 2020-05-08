@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -27,6 +29,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     EditText e,p;
     private String email,pass;
     ProgressDialog pd;
+    TextView rev,forgetpass;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,9 +46,14 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         b=findViewById(R.id.button);
         e=findViewById(R.id.editText);
         p=findViewById(R.id.editText2);
+        rev=findViewById(R.id.reverify);
+        rev.setOnClickListener(this);
         pd=new ProgressDialog(this);
         b.setOnClickListener(this);
         reg.setOnClickListener(this);
+        forgetpass=findViewById(R.id.fpass);
+        forgetpass.setOnClickListener(this);
+        forgetpass.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -65,9 +73,15 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 pd.dismiss();
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(getApplicationContext(), "Logging Successful", Toast.LENGTH_SHORT).show();
-                                    finish();
-                                    startActivity(new Intent(getApplicationContext(), ChatBox.class));
+                                    if(FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
+                                        Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                        startActivity(new Intent(getApplicationContext(), ChatBox.class));
+                                    }
+                                    else
+                                    {
+                                        Toast.makeText(getApplicationContext(),"Please Verify your Email address",Toast.LENGTH_SHORT).show();
+                                    }
                                 } else {
                                     Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 }
@@ -79,6 +93,45 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         {
             finish();
             startActivity(new Intent(getApplicationContext(),Registration.class));
+        }
+        if(v==rev)
+        {
+            auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        Toast.makeText(getApplicationContext(), "Verification email sent. Please check and verify your email id and login again.", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+        if(v==forgetpass){
+            forgetpass.setVisibility(View.INVISIBLE);
+            String forgetPasswordEmail=e.getText().toString().trim();
+            if(forgetPasswordEmail.equals(""))
+            {
+                Toast.makeText(getApplicationContext(),"Enter the Email ID",Toast.LENGTH_SHORT).show();
+                return;
+            }
+            auth.sendPasswordResetEmail(forgetPasswordEmail)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful())
+                            {
+                                Toast.makeText(getApplicationContext(),"Reset Password link sent to your email.",Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                forgetpass.setVisibility(View.VISIBLE);
+                                Toast.makeText(getApplicationContext(),task.getException().getMessage(),Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+                    });
         }
     }
 
