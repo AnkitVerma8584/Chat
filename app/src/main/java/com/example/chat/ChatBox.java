@@ -59,13 +59,13 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_box);
+        auth = FirebaseAuth.getInstance();
         getSupportActionBar().setTitle("Chatable: Your Chats");
         if(!FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
-            Toast.makeText(getApplicationContext(), "Please verify your email ID and login again.", Toast.LENGTH_SHORT).show();
+            auth.signOut();
             finish();
-            startActivity(new Intent(getApplicationContext(), Home.class));
+            startActivity(new Intent(getApplicationContext(), Login.class));
         }
-        auth = FirebaseAuth.getInstance();
         t = findViewById(R.id.table);
         db = FirebaseDatabase.getInstance().getReference().child("ChatBox");
         df = FirebaseDatabase.getInstance().getReference().child("Users");
