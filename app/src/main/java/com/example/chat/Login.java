@@ -37,17 +37,22 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         getSupportActionBar().hide();
         getSupportActionBar().setTitle("Login Page");
         auth=FirebaseAuth.getInstance();
-        if(auth.getCurrentUser()!=null)
+        rev=findViewById(R.id.reverify);
+        rev.setVisibility(View.VISIBLE);
+        rev.setOnClickListener(this);
+        if(auth.getCurrentUser()!=null )
         {
+            if(auth.getCurrentUser().isEmailVerified()) {
             finish();
-            startActivity(new Intent(getApplicationContext(),ChatBox.class));
+            startActivity(new Intent(getApplicationContext(), ChatBox.class));
+            }
+            else
+                Toast.makeText(getApplicationContext(),"Please verify your email address and login again.",Toast.LENGTH_SHORT).show();
         }
         reg=findViewById(R.id.textView3);
         b=findViewById(R.id.button);
         e=findViewById(R.id.editText);
         p=findViewById(R.id.editText2);
-        rev=findViewById(R.id.reverify);
-        rev.setOnClickListener(this);
         pd=new ProgressDialog(this);
         b.setOnClickListener(this);
         reg.setOnClickListener(this);
@@ -96,18 +101,43 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         }
         if(v==rev)
         {
-            auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful()){
-                        Toast.makeText(getApplicationContext(), "Verification email sent. Please check and verify your email id and login again.", Toast.LENGTH_SHORT).show();
-                    }
-                    else
-                    {
-                        Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
+            email=e.getText().toString();
+            pass=p.getText().toString();
+            if(email.length()==0 || pass.length()==0)
+                Toast.makeText(getApplicationContext(),"One or More Fields are Empty. Please fill them.",Toast.LENGTH_SHORT).show();
+            else {
+                pd.setMessage("Checking Verification");
+                pd.show();
+                auth.signInWithEmailAndPassword(email, pass)
+                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                pd.dismiss();
+                                if (task.isSuccessful()) {
+                                    if(FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
+                                        Toast.makeText(getApplicationContext(), "Email already verified.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else
+                                    {
+                                        auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful()){
+                                                    rev.setVisibility(View.INVISIBLE);
+                                                    Toast.makeText(getApplicationContext(), "Verification email sent. Please verify your email id and login again.", Toast.LENGTH_SHORT).show();
+                                                }
+                                                else
+                                                {
+                                                    Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        });
+
+            }
         }
         if(v==forgetpass){
             forgetpass.setVisibility(View.INVISIBLE);
