@@ -393,8 +393,6 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                         SpannableString spannableString=new SpannableString(s1);
                         spannableString.setSpan(new ForegroundColorSpan(Color.WHITE),s1.indexOf('('),s1.indexOf(')')+1,0);
                         if(unseen_message>0) {
-                            MediaPlayer ring= MediaPlayer.create(getApplicationContext(),R.raw.sent);
-                            ring.start();
                             spannableString.setSpan(new ForegroundColorSpan(Color.BLACK), s1.indexOf('%') + 1, s1.indexOf('&'), 0);
                             spannableString.setSpan(new BackgroundColorSpan(Color.GREEN), s1.indexOf('%') + 1, s1.indexOf('&'), 0);
                             unseen_message=0;
