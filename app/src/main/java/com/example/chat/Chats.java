@@ -36,13 +36,15 @@ import java.util.Date;
 import java.util.Locale;
 public class Chats extends AppCompatActivity implements View.OnClickListener {
     String p,a;
-    DatabaseReference db,ud;
+    DatabaseReference db,ud,dbr;
     FirebaseAuth auth;
     TableLayout t;
     Button b;
     EditText text;
     ScrollView scr;
     int c=0,fl=1,bl=0,f=0;
+    int bot=0;
+    int auto=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +59,19 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         a=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
         if(a.contains("."))
             a=a.replace('.','!');
+        dbr=FirebaseDatabase.getInstance().getReference().child("Users").child(a);
+        dbr.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Details dd=dataSnapshot.getValue(Details.class);
+                bot=dd.chatbot;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         chatbase(a,p);
         b=findViewById(R.id.button2);
         b.setOnClickListener(this);
@@ -230,8 +245,60 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     }
     public void seen(String em,String k)
     {
-        User b = new User(em + "*%SEEN%*");
-        db.child(k).setValue(b);
+        if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("GOOD MORNING")||em.contains("Good morning")||em.contains("good morning")||em.contains("Good Morning")) && bot==1)
+        {
+            auto++;
+            User b = new User(em + "*%SEEN%*");
+            db.child(k).setValue(b);
+            addChat(a+"\\"+"Good Morning (auto generated)");
+        }
+        else if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("GOOD AFTERNOON")||em.contains("Good afternoon")||em.contains("good afternoon")||em.contains("Good Afternoon")) && bot==1)
+        {
+            auto++;
+            User b = new User(em + "*%SEEN%*");
+            db.child(k).setValue(b);
+            addChat(a+"\\"+"Good Afternoon (auto generated)");
+        }
+        else if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("GOOD EVENING")||em.contains("Good evening")||em.contains("good evening")||em.contains("Good Evening")) && bot==1)
+        {
+            auto++;
+            User b = new User(em + "*%SEEN%*");
+            db.child(k).setValue(b);
+            addChat(a+"\\"+"Good Evening (auto generated)");
+        }
+        else if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("GOOD NIGHT")||em.contains("Good night")||em.contains("good night")||em.contains("Good Night")) && bot==1)
+        {
+            auto++;
+            User b = new User(em + "*%SEEN%*");
+            db.child(k).setValue(b);
+            addChat(a+"\\"+"Good Night (auto generated)");
+        }
+        else if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("HELLO")||em.contains("Hello")||em.contains("hello")) && bot==1)
+        {
+            auto++;
+            User b = new User(em + "*%SEEN%*");
+            db.child(k).setValue(b);
+            addChat(a+"\\"+"Hello (auto generated)");
+        }
+        else if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("BYE")||em.contains("Bye")||em.contains("bye")) && bot==1)
+        {
+            auto++;
+            User b = new User(em + "*%SEEN%*");
+            db.child(k).setValue(b);
+            addChat(a+"\\"+"Bye (auto generated)");
+        }
+        else if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("THANK YOU")||em.contains("Thank you")||em.contains("thank you") ||em.contains("Thank You")||em.contains("Thanks")||em.contains("thanks")) && bot==1)
+        {
+            auto++;
+            User b = new User(em + "*%SEEN%*");
+            db.child(k).setValue(b);
+            addChat(a+"\\"+"Welcome (auto generated)");
+        }
+        else {
+            auto=0;
+            User b = new User(em + "*%SEEN%*");
+            db.child(k).setValue(b);
+        }
     }
     public void addChat(String n) {
         if(c==0)
@@ -255,8 +322,24 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             n = n + "$" + currentDate + "#" + currentTime;
             User u = new User(n);
             db.push().setValue(u);
-            MediaPlayer ring= MediaPlayer.create(getApplicationContext(),R.raw.sent);
-            ring.start();
+            dbr.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Details detail=dataSnapshot.getValue(Details.class);
+                    try {
+                        if(detail.soundEffect==1){
+                            MediaPlayer ring= MediaPlayer.create(getApplicationContext(),R.raw.sent);
+                            ring.start();
+                        }
+                    } catch (Exception e) {
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
             User u2=new User(""+currentDate+"%"+currentTime);
             db.child("LAST").setValue(u2);
             u=new User(commonChatBoxName(a,p));

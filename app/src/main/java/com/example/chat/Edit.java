@@ -46,6 +46,7 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
     ProgressDialog progress;
     String name,status,domain;
     TextView res;
+    int sound,chatbot;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +83,8 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
                     {
                         u.setText(det.n);
                         s.setText(det.s);
+                        sound=det.soundEffect;
+                        chatbot=det.chatbot;
                         Glide.with(getApplicationContext()).load(det.l).into(profile);
                         progress.dismiss();
                         durl=det.l;
@@ -173,7 +176,7 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
                                     public void onSuccess(Uri uri) {
 
                                         String img_url = uri.toString();// to store url of the image
-                                        Details d=new Details(name,status,img_url,domain);
+                                        Details d=new Details(name,status,img_url,domain,sound,chatbot);
                                         String z2=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
                                         if(z2.contains("."))
                                             z2=z2.replace('.','!');
@@ -194,7 +197,7 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
                             }
                         });
             } else {
-                Details d=new Details(name,status,durl,domain);
+                Details d=new Details(name,status,durl,domain,sound,chatbot);
                 String z2=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
                 if(z2.contains("."))
                     z2=z2.replace('.','!');

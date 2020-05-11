@@ -147,7 +147,7 @@ public class Info extends AppCompatActivity implements View.OnClickListener {
                                     public void onSuccess(Uri uri) {
 
                                         String img_url = uri.toString();// to store url of the image
-                                        Details d=new Details(name,status,img_url,domain);
+                                        Details d=new Details(name,status,img_url,domain,1,0);
                                         db.setValue(d);
                                         Toast.makeText(getApplicationContext(),"Details Saved",Toast.LENGTH_SHORT).show();
                                         progress.dismiss();
@@ -180,7 +180,7 @@ public class Info extends AppCompatActivity implements View.OnClickListener {
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
                                 String img_url="https://firebasestorage.googleapis.com/v0/b/chat-87dc0.appspot.com/o/default_pic.png?alt=media&token=0319c156-031c-4b07-9a0c-27ebecdd34d1";
-                                Details d=new Details(name,status,img_url,domain);
+                                Details d=new Details(name,status,img_url,domain,1,0);
                                 db.setValue(d);
                                 Toast.makeText(getApplicationContext(),"Details Saved",Toast.LENGTH_SHORT).show();
                                 finish();

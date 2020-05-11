@@ -461,6 +461,11 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
             case R.id.about:
                 finish();
                 startActivity(new Intent(getApplicationContext(),About.class));
+                return true;
+            case R.id.settings:
+                finish();
+                startActivity(new Intent(getApplicationContext(),ChatableSettings.class));
+                return true;
             default:return super.onOptionsItemSelected(item);
         }
 
