@@ -3,6 +3,7 @@ package com.example.chat;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -83,5 +84,11 @@ public class ChatableSettings extends AppCompatActivity {
                 Snackbar.make(findViewById(R.id.setting), "Changes Saved", Snackbar.LENGTH_SHORT)
                         .setAction("Action", null).show();        }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        startActivity(new Intent(getApplicationContext(),ChatBox.class));
     }
 }

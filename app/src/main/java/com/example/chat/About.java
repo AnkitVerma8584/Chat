@@ -34,4 +34,10 @@ public class About extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        startActivity(new Intent(getApplicationContext(),ChatBox.class));
+    }
 }
