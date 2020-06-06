@@ -59,7 +59,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     ScrollView scr;
     int c=0,fl=1,bl=0,f=0;
     int bot=0;
-    String fname;
+    String fname,lastChat;
+    int activityOnline;
     String unread="";
     List<String> un=new ArrayList<>();
     @Override
@@ -76,6 +77,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         a=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
         if(a.contains("."))
             a=a.replace('.','!');
+        activityOnline=1;
         dbr=FirebaseDatabase.getInstance().getReference().child("Users").child(a);
         dbr.addValueEventListener(new ValueEventListener() {
             @Override
@@ -125,6 +127,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         }
         db=FirebaseDatabase.getInstance().getReference().child("ChatBox").child(n);
         fname=n;
+        lastChat="_"+a;
         db.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -204,6 +207,12 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                         }
                         unread = "";
                     }
+                    scr.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            scr.fullScroll(View.FOCUS_DOWN);
+                        }
+                    });
                     newChats();
                 }
                 catch(Exception e){}
@@ -230,9 +239,10 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                     {
                         try {
                             final FileOutputStream fos=openFileOutput(fname,MODE_APPEND);
-                            if(!check(ss))
+                            if(!check(ss) && activityOnline==1)
                                 fos.write((ss + "\n").getBytes());
-                            db.child(dss.getKey()).removeValue();
+                            if(activityOnline==1)
+                                db.child(dss.getKey()).removeValue();
                         } catch (IOException e) {
 
                         }
@@ -637,6 +647,26 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             else
                 tvt.setText(z);
             t.addView(v);
+            //Updating the last person messaged list
+            List<String> last=new ArrayList<>();
+            FileInputStream fis2=null;
+            try{
+                fis2=openFileInput(lastChat);
+                InputStreamReader isr=new InputStreamReader(fis2);
+                BufferedReader br=new BufferedReader(isr);
+                String p1="";
+                while((p1=br.readLine())!=null){
+                    last.add(p1);
+                }
+            }catch(Exception e){}
+            FileOutputStream fos2=openFileOutput(lastChat,MODE_PRIVATE);
+            String p1=fname;
+            for(String name:last){
+                if(!p1.contains(name))
+                    p1=p1+"\n"+name;
+            }
+            fos2.write(p1.getBytes());
+
             //chatbase(a,p);
         }
     }
@@ -669,6 +699,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     public void onBackPressed() {
         finishAndRemoveTask();
         f=1;
+        activityOnline=0;
         startActivity(new Intent(getApplicationContext(),ChatBox.class));
     }
 

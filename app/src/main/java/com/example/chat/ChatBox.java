@@ -1,5 +1,6 @@
 package com.example.chat;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -33,14 +34,22 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -49,22 +58,23 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
     FirebaseAuth auth;
     DatabaseReference db,df,dl;
     private TableLayout t;
-    String u;
     int c=100;
     Display display;
-    String allname="",allnm="";
-    LoadingDialog loadingDialog=new LoadingDialog(ChatBox.this);
+    String allname="";
+    //LoadingDialog loadingDialog=new LoadingDialog(ChatBox.this);
     ScrollView scr;
     int fl=0,unseen_message=0,first_time=0;
     FloatingActionButton flab;
     int flag=0;
     String name[];
+    List<String> last=new ArrayList<>();
+    String lastChat="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_box);
         auth = FirebaseAuth.getInstance();
-        getSupportActionBar().setTitle("Chatable: Your Chats");
+        getSupportActionBar().setTitle("Chatable");
         if(!FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
             auth.signOut();
             flag=1;
@@ -80,12 +90,118 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
         flab=findViewById(R.id.fab);
         flab.setOnClickListener(this);
         first_time=0;
-        //start();
         if(flag==0) {
-            begin();
+            load();
+        }
+
+    }
+
+    public void load()
+    {
+        String jj="";
+        lastChat="_"+auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
+        FileInputStream fis2=null;
+        try{
+            fis2=openFileInput(lastChat);
+            InputStreamReader isr=new InputStreamReader(fis2);
+            BufferedReader br=new BufferedReader(isr);
+            String p1="";
+            while((p1=br.readLine())!=null){
+                last.add(p1);
+            }
+        }catch(Exception e){}
+        display();
+    }
+
+    public void display(){
+        try {
+            t.removeAllViews();
+            scr.setBackgroundColor(Color.WHITE);
+            fl=0;
+            c=100;
+            int i=0;
+            for(String u:last) {
+                unseen_message = 0;
+                final TableRow tr = new TableRow(getApplicationContext());
+                tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+                final Button b = new Button(getApplicationContext());
+                CircleImageView civ = new CircleImageView(getApplicationContext());
+                String zz = auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
+                if (zz.contains("."))
+                    zz = zz.replace('.', '!');
+                if (u.contains(zz)) {
+                    final String t1 = u.substring(0, u.indexOf('^')), t2 = u.substring(u.indexOf('^') + 1);
+                    if (t1.equals(zz)) {
+                        db.child(u).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
+                                unseen_message = 0;
+                                for (DataSnapshot ds1 : dataSnapshot2.getChildren())  {
+                                    User uu=ds1.getValue(User.class);
+                                    if(uu.email.contains(t2+"\\"))
+                                        unseen_message++;
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                            }
+                        });
+                        getname(t2, c);
+                        Drawable bac = getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
+                        b.setBackground(bac);
+                        b.setPadding(15, 5, 25000, 10);
+                        b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                        b.setId(c);
+                        civ.setId(100 * c);
+                        c++;
+                        tr.addView(civ);
+                        tr.addView(b);
+                    } else if (t2.equals(zz)) {
+                        db.child(u).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
+                                unseen_message = 0;
+                                for (DataSnapshot ds1 : dataSnapshot2.getChildren()) {
+                                    User uu=ds1.getValue(User.class);
+                                    if(uu.email.contains(t1+"\\"))
+                                        unseen_message++;
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) { }
+                        });
+                        getname(t1, c);
+                        Drawable bac = getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
+                        b.setBackground(bac);
+                        b.setPadding(15, 5, 25000, 10);
+                        b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                        b.setId(c);
+                        civ.setId(100 * c);
+                        c++;
+                        tr.addView(civ);
+                        tr.addView(b);
+                    }
+                }
+                t.addView(tr);
+                allname = allname + u;
+            }
+            /*if(i==name.length && first_time==0)
+            {
+                change();
+                first_time=1;
+                //begin();
+            }*/
+            try {
+                checkClick();
+                checkImClick();
+            } catch (Exception e) {
+            }
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
         }
     }
-    public void begin(){
+
+    /*public void begin(){
         fl=0;
         flab.setVisibility(View.VISIBLE);
         try {
@@ -110,7 +226,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                                     allnm=allnm+t2+"$";
                                 } else if (t2.equals(zz)) {
                                     allnm=allnm+t1+"$";
-                                }*/
+                                }
                                 allnm = allnm + u + "$";
                             }
                         }
@@ -127,8 +243,8 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
         }
-    }
-    public void sort(String n)
+    }*/
+    /*public void sort(String n)
     {
         int p=0;
         for(int i=0;i<n.length();i++)
@@ -147,8 +263,8 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                 t=t+n.charAt(i);
         }
         display();
-    }
-    public void display(){
+    }*/
+    /*public void display(){
         fl=0;
         allname="";
         try {
@@ -247,7 +363,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
         }
-    }
+    }*/
     /*public void start(){
         fl=0;
         try {
@@ -357,13 +473,13 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
             Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
         }
     }*/
-    public void change()
+    /*public void change()
     {
         String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
         String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
         User ue=new User("$"+currentDate+"#"+currentTime);
         dl.child("-CHECK").setValue(ue);
-    }
+    }*/
     public void getname(final String n,final int t)
     {
         df.addValueEventListener(new ValueEventListener() {
@@ -377,7 +493,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                         try {
                             Glide.with(getApplicationContext()).load(u.l).into(civ);
                         } catch (Exception e) {
-                            begin();
+                            display();
                         }
                         Point size=new Point();
                         display.getSize(size);
@@ -391,7 +507,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                         b.setTransformationMethod(null);
                         String s1=u.n+"\t"+" (%"+unseen_message+"&"+d1.getKey()+u.d+") "+"\n"+u.s;
                         SpannableString spannableString=new SpannableString(s1);
-                        spannableString.setSpan(new ForegroundColorSpan(Color.WHITE),s1.indexOf('('),s1.indexOf(')')+1,0);
+                        spannableString.setSpan(new ForegroundColorSpan(Color.WHITE),s1.indexOf('('),s1.lastIndexOf(')')+1,0);
                         if(unseen_message>0) {
                             spannableString.setSpan(new ForegroundColorSpan(Color.BLACK), s1.indexOf('%') + 1, s1.indexOf('&'), 0);
                             spannableString.setSpan(new BackgroundColorSpan(Color.GREEN), s1.indexOf('%') + 1, s1.indexOf('&'), 0);
@@ -415,7 +531,8 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
     public void getEmail(final String n)
     {
         Intent Int=new Intent(getApplicationContext(),Chats.class);
-        Int.putExtra("person",""+n.substring(n.indexOf('&')+1,n.indexOf(')'))+"&"+n.substring(0,n.indexOf('(')-1));
+        Int.putExtra("person",""+n.substring(n.indexOf('&')+1,n.lastIndexOf(')'))+"&"+n.substring(0,n.indexOf('(')-1));
+        finish();
         startActivity(Int);
     }
 
@@ -466,6 +583,9 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                 finish();
                 startActivity(new Intent(getApplicationContext(),ChatableSettings.class));
                 return true;
+            case R.id.sync:
+                last.clear();
+                load();
             default:return super.onOptionsItemSelected(item);
         }
 
@@ -483,6 +603,38 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
 
                 }
             });
+            //TODO delete a selected
+            /*b.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    AlertDialog.Builder alt=new AlertDialog.Builder(getApplicationContext());
+                    alt.setTitle("Warning!")
+                            .setCancelable(false)
+                            .setMessage("Are you sure you want to delete this chat?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    try {
+                                        final FileOutputStream fos=openFileOutput(fname,MODE_PRIVATE);
+                                        fos.write("".getBytes());
+
+                                        Toast.makeText(getApplicationContext(),"Chat deleted",Toast.LENGTH_SHORT).show();
+                                    } catch (IOException e) {
+
+                                    }
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    AlertDialog aaa=alt.create();
+                    aaa.show();
+                    return false;
+                }
+            });*/
         }
     }
 
@@ -526,16 +678,14 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                         txt.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                //start();
-                                begin();
+                                display();
                             }
                         });
                     }
                 });
             } catch (Exception e) {
                 Toast.makeText(getApplicationContext(),"Picture changed",Toast.LENGTH_SHORT).show();
-                //start();
-                begin();
+                display();
             }
 
         }
@@ -577,8 +727,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
             finishAffinity();
         }
         else if(fl==1){
-            //start();
-            begin();
+            display();
         }
 
     }
