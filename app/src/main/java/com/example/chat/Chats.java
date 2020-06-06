@@ -240,9 +240,13 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                         try {
                             final FileOutputStream fos=openFileOutput(fname,MODE_APPEND);
                             if(!check(ss) && activityOnline==1)
+                            {
                                 fos.write((ss + "\n").getBytes());
+                            }
                             if(activityOnline==1)
+                            {
                                 db.child(dss.getKey()).removeValue();
+                            }
                         } catch (IOException e) {
 
                         }
