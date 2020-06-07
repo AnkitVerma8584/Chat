@@ -4,19 +4,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -71,18 +67,29 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
     List<String> last=new ArrayList<>();
     String lastChat="";
     String a="";
+    String fblock="blockList";
+    List<String> blocks=new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_box);
         auth = FirebaseAuth.getInstance();
-        getSupportActionBar().setTitle("Chatable");
+
         if(!FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
             auth.signOut();
             flag=1;
             finish();
             startActivity(new Intent(getApplicationContext(), Login.class));
         }
+        try {
+            FileInputStream fis = openFileInput(fblock);
+            String string;
+            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+            while ((string = br.readLine()) != null) {
+                blocks.add(string);
+                //Toast.makeText(getApplicationContext(),string,Toast.LENGTH_SHORT).show();
+            }
+        }catch(Exception e){}
         t = findViewById(R.id.table);
         db = FirebaseDatabase.getInstance().getReference().child("ChatBox");
         df = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -102,16 +109,6 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
     public void load()
     {
         lastChat="_"+auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
-        /*FileInputStream fis2=null;
-        try{
-            fis2=openFileInput(lastChat);
-            InputStreamReader isr=new InputStreamReader(fis2);
-            BufferedReader br=new BufferedReader(isr);
-            String p1="";
-            while((p1=br.readLine())!=null){
-                last.add(p1);
-            }
-        }catch(Exception e){}*/
         last.clear();hh="";
         FileInputStream fis2=null;
         try{
@@ -184,6 +181,14 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                 String zz = auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
                 if (zz.contains("."))
                     zz = zz.replace('.', '!');
+                int gl=0;
+                for(String bl:blocks){
+                    if(bl.contains(u)){
+                        gl=1;
+                        break;
+                    }
+                }
+                final int gg=gl;
                 if (u.contains(zz)) {
                     final String t1 = u.substring(0, u.indexOf('^')), t2 = u.substring(u.indexOf('^') + 1);
                     if (t1.equals(zz)) {
@@ -196,11 +201,14 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                                     if(uu.email.contains(t2+"\\"))
                                         unseen_message++;
                                 }
+                                if(gg==1)
+                                    unseen_message=0;
                             }
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
                             }
                         });
+
                         getname(t2, c);
                         Drawable bac = getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
                         b.setBackground(bac);
@@ -221,10 +229,13 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                                     if(uu.email.contains(t1+"\\"))
                                         unseen_message++;
                                 }
+                                if(gg==1)
+                                    unseen_message=0;
                             }
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) { }
                         });
+
                         getname(t1, c);
                         Drawable bac = getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
                         b.setBackground(bac);
@@ -255,286 +266,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
             Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
         }
     }
-
-    /*public void begin(){
-        fl=0;
-
-        try {
-            loadingDialog.startLoadingDialog();
-            dl.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    t.removeAllViews();
-                    scr.setBackgroundColor(Color.WHITE);
-                    fl=0;
-                    c=100;
-                    for(DataSnapshot d1 : dataSnapshot.getChildren())  {
-                        User all=d1.getValue(User.class);
-                        if(!d1.getKey().equals("-CHECK")) {
-                            u = all.email;
-                            String zz = auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
-                            if (zz.contains("."))
-                                zz = zz.replace('.', '!');
-                            if (u.contains(zz)) {
-                                final String t1 = u.substring(0, u.indexOf('^')), t2 = u.substring(u.indexOf('^') + 1);
-                                /*if (t1.equals(zz)) {
-                                    allnm=allnm+t2+"$";
-                                } else if (t2.equals(zz)) {
-                                    allnm=allnm+t1+"$";
-                                }
-                                allnm = allnm + u + "$";
-                            }
-                        }
-
-                    }
-                    loadingDialog.dismissDialog();
-                    sort(allnm);
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
-        }
-    }*/
-    /*public void sort(String n)
-    {
-        int p=0;
-        for(int i=0;i<n.length();i++)
-            if(n.charAt(i)=='$')
-                p++;
-        name=new String[p];
-        String t="";int nc=p-1;
-        for(int i=0;i<n.length();i++)
-        {
-            if(n.charAt(i)=='$')
-            {
-                name[nc--]=t;
-                t="";
-            }
-            else
-                t=t+n.charAt(i);
-        }
-        display();
-    }*/
-    /*public void display(){
-        fl=0;
-        allname="";
-        try {
-            t.removeAllViews();
-            scr.setBackgroundColor(Color.WHITE);
-            fl=0;
-            c=100;
-            int i;
-            for(i=0;i<name.length;i++) {
-                u = name[i];
-                unseen_message = 0;
-                //Toast.makeText(getApplicationContext(),u,Toast.LENGTH_SHORT).show();
-                if (!allname.contains(u)) {
-                    final TableRow tr = new TableRow(getApplicationContext());
-                    tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-                    final Button b = new Button(getApplicationContext());
-                    CircleImageView civ = new CircleImageView(getApplicationContext());
-                    String zz = auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
-                    if (zz.contains("."))
-                        zz = zz.replace('.', '!');
-                    if (u.contains(zz)) {
-
-                        final String t1 = u.substring(0, u.indexOf('^')), t2 = u.substring(u.indexOf('^') + 1);
-                        if (t1.equals(zz)) {
-                            db.child(u).addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
-                                    unseen_message = 0;
-                                    for (DataSnapshot ds1 : dataSnapshot2.getChildren()) {
-                                        User ch = ds1.getValue(User.class);
-                                        if (ch.email.contains(t2 + "\\") && !ch.email.contains("*%SEEN%*")) {
-                                            unseen_message++;
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                }
-                            });
-                            getname(t2, c);
-                            Drawable bac = getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
-                            b.setBackground(bac);
-                            b.setPadding(15, 5, 25000, 10);
-                            b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-                            b.setId(c);
-                            civ.setId(100 * c);
-                            c++;
-                            tr.addView(civ);
-                            tr.addView(b);
-                        } else if (t2.equals(zz)) {
-                            db.child(u).addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
-                                    unseen_message = 0;
-                                    for (DataSnapshot ds1 : dataSnapshot2.getChildren()) {
-                                        User ch = ds1.getValue(User.class);
-                                        if (ch.email.contains(t1 + "\\") && !ch.email.contains("*%SEEN%*")) {
-                                            unseen_message++;
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                }
-                            });
-                            getname(t1, c);
-                            Drawable bac = getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
-                            b.setBackground(bac);
-                            b.setPadding(15, 5, 25000, 10);
-                            b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-                            b.setId(c);
-                            civ.setId(100 * c);
-                            c++;
-                            tr.addView(civ);
-                            tr.addView(b);
-                        }
-                    }
-                    t.addView(tr);
-                    allname = allname + u;
-                }
-
-            }
-            if(i==name.length && first_time==0)
-            {
-                change();
-                first_time=1;
-                begin();
-            }
-            try {
-                checkClick();
-                checkImClick();
-            } catch (Exception e) {
-            }
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
-        }
-    }*/
-    /*public void start(){
-        fl=0;
-        try {
-            loadingDialog.startLoadingDialog();
-            dl.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    t.removeAllViews();
-                    scr.setBackgroundColor(Color.WHITE);
-                    fl=0;
-                    c=100;
-                    for(DataSnapshot d1 : dataSnapshot.getChildren())  {
-                        User all=d1.getValue(User.class);
-                        u=all.email;
-                        if(!allname.contains(u))
-                        {
-                            if (first_time == 0) {
-                                change(u);
-                            }
-                            final TableRow tr = new TableRow(getApplicationContext());
-                            tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-                            final Button b = new Button(getApplicationContext());
-                            CircleImageView civ = new CircleImageView(getApplicationContext());
-                            String zz = auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
-                            if (zz.contains("."))
-                                zz = zz.replace('.', '!');
-                            if (u.contains(zz)) {
-                                final String t1 = u.substring(0, u.indexOf('^')), t2 = u.substring(u.indexOf('^') + 1);
-                                if (t1.equals(zz)) {
-                                    db.child(u).addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
-                                            unseen_message = 0;
-                                            for (DataSnapshot ds1 : dataSnapshot2.getChildren()) {
-                                                User ch = ds1.getValue(User.class);
-                                                if (ch.email.contains(t2 + "\\") && !ch.email.contains("*%SEEN%*")) {
-                                                    unseen_message++;
-                                                }
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
-                                    getname(t2, c);
-                                    Drawable bac = getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
-                                    b.setBackground(bac);
-                                    b.setPadding(15, 5, 25000, 10);
-                                    b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-                                    b.setId(c);
-                                    civ.setId(100 * c);
-                                    c++;
-                                    tr.addView(civ);
-                                    tr.addView(b);
-                                } else if (t2.equals(zz)) {
-                                    db.child(u).addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
-                                            unseen_message = 0;
-                                            for (DataSnapshot ds1 : dataSnapshot2.getChildren()) {
-                                                User ch = ds1.getValue(User.class);
-                                                if (ch.email.contains(t1 + "\\") && !ch.email.contains("*%SEEN%*")) {
-                                                    unseen_message++;
-                                                }
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
-                                    getname(t1, c);
-                                    Drawable bac = getApplicationContext().getResources().getDrawable(R.drawable.chatbox);
-                                    b.setBackground(bac);
-                                    b.setPadding(15, 5, 25000, 10);
-                                    b.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-                                    b.setId(c);
-                                    civ.setId(100 * c);
-                                    c++;
-                                    tr.addView(civ);
-                                    tr.addView(b);
-                                }
-                            }
-                            t.addView(tr);
-                            allname=allname+u;
-                        }
-
-                    }
-                    if(first_time==0)
-                        first_time=1;
-                    loadingDialog.dismissDialog();
-                    try {
-                        checkClick();
-                        checkImClick();
-                    } catch (Exception e) {
-                    }
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
-        }
-    }*/
-    /*public void change()
-    {
-        String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-        String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-        User ue=new User("$"+currentDate+"#"+currentTime);
-        dl.child("-CHECK").setValue(ue);
-    }*/
+    
     public void getname(final String n,final int t)
     {
         df.addValueEventListener(new ValueEventListener() {
@@ -589,6 +321,101 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
         Int.putExtra("person",""+n.substring(n.indexOf('&')+1,n.lastIndexOf(')'))+"&"+n.substring(0,n.indexOf('(')-1));
         finish();
         startActivity(Int);
+    }
+
+    public void checkClick()
+    {
+        for(int i=100;i<c;i++)
+        {
+            final Button b=scr.findViewById(i);
+            b.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getEmail(""+b.getText());
+
+                }
+            });
+            b.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    longClick(b);
+                    return false;
+                }
+            });
+        }
+    }
+
+    public void longClick(final Button b){
+        AlertDialog.Builder alt=new AlertDialog.Builder(this);
+        alt.setTitle("Warning!")
+                .setCancelable(false)
+                .setMessage("Are you sure you want to delete this chat?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            String n=b.getText().toString();
+                            n=n.substring(n.indexOf('&')+1,n.lastIndexOf('@'));
+                            n=common(a,n);
+                            String fname=n;
+                            FileOutputStream fos=openFileOutput(fname,MODE_PRIVATE);
+                            fos.write("".getBytes());
+
+                            FileInputStream fis=openFileInput(lastChat);
+                            InputStreamReader isr=new InputStreamReader(fis);
+                            BufferedReader br=new BufferedReader(isr);
+                            String p1="";
+                            List<String> refresh=new ArrayList<>();
+                            while((p1=br.readLine())!=null){
+                                if(!p1.equals(fname))
+                                    refresh.add(p1);
+                            }
+                            p1="";
+                            fos=openFileOutput(lastChat,MODE_PRIVATE);
+                            for(String g:refresh){
+                                p1=p1+g+"\n";
+                            }
+                            fos.write(p1.getBytes());
+                            Toast.makeText(getApplicationContext(),"Chat deleted",Toast.LENGTH_SHORT).show();
+                            db.child(fname).removeValue();
+                            load();
+                        } catch (IOException e) {
+
+                        }
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog aaa=alt.create();
+        aaa.show();
+    }
+
+    public String common(String a1,String p1){
+        int i=0;String n="";
+        while(i<a1.length() && i<p1.length())
+        {
+            if((int)(a1.charAt(i))<(int)(p1.charAt(i)))
+            {
+                n=""+(a1+"^"+p1);
+                break;
+            }
+            else if((int)(a1.charAt(i))>(int)(p1.charAt(i)))
+            {
+                n=""+(p1+"^"+a1);
+                break;
+            }else{
+                if(a1.length()<p1.length())
+                    n=""+(a1+"^"+p1);
+                else
+                    n=""+(p1+"^"+a1);
+            }
+            i++;
+        }
+        return n;
     }
 
     @Override
@@ -646,52 +473,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
 
     }
 
-    public void checkClick()
-    {
-        for(int i=100;i<c;i++)
-        {
-            final Button b=scr.findViewById(i);
-            b.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getEmail(""+b.getText());
 
-                }
-            });
-            //TODO delete a selected
-            /*b.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    AlertDialog.Builder alt=new AlertDialog.Builder(getApplicationContext());
-                    alt.setTitle("Warning!")
-                            .setCancelable(false)
-                            .setMessage("Are you sure you want to delete this chat?")
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    try {
-                                        final FileOutputStream fos=openFileOutput(fname,MODE_PRIVATE);
-                                        fos.write("".getBytes());
-
-                                        Toast.makeText(getApplicationContext(),"Chat deleted",Toast.LENGTH_SHORT).show();
-                                    } catch (IOException e) {
-
-                                    }
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    AlertDialog aaa=alt.create();
-                    aaa.show();
-                    return false;
-                }
-            });*/
-        }
-    }
 
     public void checkImClick()
     {

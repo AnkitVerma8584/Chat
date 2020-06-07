@@ -64,6 +64,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     String unread="";
     List<String> un=new ArrayList<>();
     String autotext="";
+    String fblock="blockList";
+    List<String> blocks=new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +77,15 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         auth=FirebaseAuth.getInstance();
         getSupportActionBar().setTitle(t1);
         t=findViewById(R.id.table);
+        try {
+            FileInputStream fis = openFileInput(fblock);
+            String string;
+            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+            while ((string = br.readLine()) != null) {
+                blocks.add(string);
+                //Toast.makeText(getApplicationContext(),string,Toast.LENGTH_SHORT).show();
+            }
+        }catch(Exception e){}
         a=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
         if(a.contains("."))
             a=a.replace('.','!');
@@ -128,6 +139,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         }
         db=FirebaseDatabase.getInstance().getReference().child("ChatBox").child(n);
         fname=n;
+
         lastChat="_"+a;
         db.addValueEventListener(new ValueEventListener() {
             @Override
@@ -239,7 +251,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                     //Toast.makeText(getApplicationContext(),"File Doesnt exist",Toast.LENGTH_SHORT).show();
                 }
                 finally{
-                    newChats();
+                    if(!blocks.contains(fname))
+                        newChats();
                 }
 
             }
@@ -359,10 +372,13 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     @Override
     protected boolean onPrepareOptionsPanel(View view, Menu menu) {
         MenuItem item=menu.findItem(R.id.item6);
-        if(bl==1)
+        if(blocks.contains(fname))
+        {
             item.setTitle("Unblock");
-        else if(bl==0)
+        }
+        else {
             item.setTitle("Block");
+        }
         return true;
     }
 
@@ -378,307 +394,11 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         }
         return false;
     }
-    /*public void readChat() throws IOException {
-        final FileOutputStream fos=openFileOutput(fname,MODE_APPEND);
-        db.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    for(DataSnapshot ds: dataSnapshot.getChildren()){
-                        User u=ds.getValue(User.class);
-                        String z = u.email;
-                        if(!ds.getKey().equals(a+"\\"+"BLOCK") && !ds.getKey().equals(p+"\\"+"BLOCK") && !ds.getKey().equals("BLANK") && !ds.getKey().equals("LAST")) {
-                            if (!check(z) ) {
-                                fos.write((z + "\n").getBytes());
-                                if (z.contains(p + "\\") )
-                                    db.child(ds.getKey()).removeValue();
-                            }
-                        }
-                    }
-                    fos.close();
-                } catch (IOException e) {
-                }
-                try {
-                    showChat();
-                } catch (IOException e) {
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        })   ;
-    }*/
-    /*
-    public void showChat() throws IOException {
-        FileInputStream fis=null;
-        fis=openFileInput(fname);
-        InputStreamReader isr=new InputStreamReader(fis);
-        BufferedReader br=new BufferedReader(isr);
-        String text;
-        while((text=br.readLine())!=null){
-            if (text.contains(a + "\\")) {
-                String z = (text.substring(text.indexOf('\\') + 1));
-                LayoutInflater inflater = getLayoutInflater();
-                if(!checkDatabase(text))
-                {
-                    View v = inflater.inflate(R.layout.right_chat, null);
-                    TextView tvt = v.findViewById(R.id.r_message);
-                    if (z.indexOf('$') > -1)
-                    {
-                        String p;
-                        if(z.contains("*%SEEN%*"))
-                            p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1,z.lastIndexOf('*')-7);
-                        else
-                            p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1);
-                        SpannableString spannableString=new SpannableString(p);
-                        spannableString.setSpan(new RelativeSizeSpan(0.6f),p.indexOf(':')-2,p.length(),0);
-                        spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':')-2,p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        tvt.setText(spannableString);
-                    }
-                    else
-                        tvt.setText(z);
-                    t.addView(v);
-                }
-                else{
-                    View v = inflater.inflate(R.layout.seen, null);
-                    TextView tvt = v.findViewById(R.id.r_message);
-                    if (z.indexOf('$') > -1){
-                        String p;
-                        if(z.contains("*%SEEN%*"))
-                            p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1,z.lastIndexOf('*')-7);
-                        else
-                            p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1);
-                        SpannableString spannableString=new SpannableString(p);
-                        spannableString.setSpan(new RelativeSizeSpan(0.6f),p.indexOf(':')-2,p.length(),0);
-                        spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':')-2,p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        tvt.setText(spannableString);
-                    }
-                    else
-                    {
-                        tvt.setText(z);
-                    }
-                    t.addView(v);
-                }
-                c++;
-            }
-            if (text.contains(p + "\\")) {
-                String z = (text.substring(text.indexOf('\\') + 1));
-                LayoutInflater inflater = getLayoutInflater();
-                View v = inflater.inflate(R.layout.left_chat, null);
-                TextView tvt = v.findViewById(R.id.l_message);
-                if (z.indexOf('$') > -1)
-                {
-                    String p;
-                    if(z.contains("*%SEEN%*"))
-                        p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1,z.lastIndexOf('*')-7);
-                    else
-                        p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1);
-                    SpannableString spannableString=new SpannableString(p);
-                    spannableString.setSpan(new RelativeSizeSpan(0.6f),p.indexOf(':')-2,p.length(),0);
-                    spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':')-2,p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    tvt.setText(spannableString);
-                }
-                else
-                {
-                    tvt.setText(z);
-                }
-                c++;
-                t.addView(v);
-            }
-        }
-        scr.post(new Runnable() {
-            @Override
-            public void run() {
-                scr.fullScroll(View.FOCUS_DOWN);
-            }
-        });
-        readChat();
-    }
- */
-    /*
-    public void viewChat()
-    {
-        db.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                t.removeAllViews();
-                fl=1;
-                c=0;
-                for (DataSnapshot ds1 : dataSnapshot.getChildren()) {
-                    try {
-                        User u = ds1.getValue(User.class);
-                        final TableRow tr=new TableRow(getApplicationContext());
-                        tr.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT,TableLayout.LayoutParams.WRAP_CONTENT));
-                        tr.setGravity(Gravity.CENTER);
-                        if(!ds1.getKey().equals(a+"\\"+"BLOCK") && !ds1.getKey().equals(p+"\\"+"BLOCK") && !ds1.getKey().equals("BLANK") && !ds1.getKey().equals("LAST")) {
-                            if (u.email.contains(a + "\\")) {
-                                String z = (u.email.substring(u.email.indexOf('\\') + 1));
-                                LayoutInflater inflater = getLayoutInflater();
-                                if(!u.email.contains("*%SEEN%*"))
-                                {
-                                    View v = inflater.inflate(R.layout.right_chat, null);
-                                    TextView tvt = v.findViewById(R.id.r_message);
-                                    if (z.indexOf('$') > -1)
-                                    {
-                                        String p;
-                                        if(z.contains("*%SEEN%*"))
-                                            p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1,z.lastIndexOf('*')-7);
-                                        else
-                                            p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1);
-                                        SpannableString spannableString=new SpannableString(p);
-                                        spannableString.setSpan(new RelativeSizeSpan(0.6f),p.indexOf(':')-2,p.length(),0);
-                                        spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':')-2,p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                        tvt.setText(spannableString);
-                                    }
-                                    else
-                                        tvt.setText(z);
-                                    t.addView(v);
-                                }
-                                else{
-                                    View v = inflater.inflate(R.layout.seen, null);
-                                    TextView tvt = v.findViewById(R.id.r_message);
-                                    if (z.indexOf('$') > -1){
-                                        String p;
-                                        if(z.contains("*%SEEN%*"))
-                                            p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1,z.lastIndexOf('*')-7);
-                                        else
-                                            p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1);
-                                        SpannableString spannableString=new SpannableString(p);
-                                        spannableString.setSpan(new RelativeSizeSpan(0.6f),p.indexOf(':')-2,p.length(),0);
-                                        spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':')-2,p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                        tvt.setText(spannableString);
-                                    }
-                                    else
-                                    {
-                                        tvt.setText(z);
-                                    }
-                                    t.addView(v);
-                                }
-                                c++;
-                            }
-                            if (u.email.contains(p + "\\")) {
-                                String z = (u.email.substring(u.email.indexOf('\\') + 1));
-                                LayoutInflater inflater = getLayoutInflater();
-                                View v = inflater.inflate(R.layout.left_chat, null);
-                                TextView tvt = v.findViewById(R.id.l_message);
-                                if (z.indexOf('$') > -1)
-                                {
-                                    String p;
-                                    if(z.contains("*%SEEN%*"))
-                                        p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1,z.lastIndexOf('*')-7);
-                                    else
-                                        p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1);
-                                    SpannableString spannableString=new SpannableString(p);
-                                    spannableString.setSpan(new RelativeSizeSpan(0.6f),p.indexOf(':')-2,p.length(),0);
-                                    spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':')-2,p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                    tvt.setText(spannableString);
-                                }
-                                else
-                                {
-                                    tvt.setText(z);
-                                }
-                                c++;
-                                if(!u.email.contains("*%SEEN%*") && f==0) {
-                                    seen(u.email,ds1.getKey());
-                                }
-                                t.addView(v);
-                            }
-                        }
-                        else if(u.email.equals("Block"))
-                        {
-                            fl=fl*0;
-                            if(ds1.getKey().equals(a+"\\"+"BLOCK"))
-                                bl=1;
-                        }
-                        else if(u.email.equals("Unblock")){
-                            fl=fl*1;
-                            if(ds1.getKey().equals(a+"\\"+"BLOCK"))
-                                bl=0;
-                        }
-                    } catch (NullPointerException npe) {
-                    }
-                }
-                scr.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        scr.fullScroll(View.FOCUS_DOWN);
-                    }
-                });
-                invalidateOptionsMenu();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-    }
-    public void seen(String em,String k)
-    {
-        if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("GOOD MORNING")||em.contains("Good morning")||em.contains("good morning")||em.contains("Good Morning")) && bot==1)
-        {
-            auto++;
-            User b = new User(em + "*%SEEN%*");
-            db.child(k).setValue(b);
-            addChat(a+"\\"+"Good Morning (auto generated)");
-        }
-        else if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("GOOD AFTERNOON")||em.contains("Good afternoon")||em.contains("good afternoon")||em.contains("Good Afternoon")) && bot==1)
-        {
-            auto++;
-            User b = new User(em + "*%SEEN%*");
-            db.child(k).setValue(b);
-            addChat(a+"\\"+"Good Afternoon (auto generated)");
-        }
-        else if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("GOOD EVENING")||em.contains("Good evening")||em.contains("good evening")||em.contains("Good Evening")) && bot==1)
-        {
-            auto++;
-            User b = new User(em + "*%SEEN%*");
-            db.child(k).setValue(b);
-            addChat(a+"\\"+"Good Evening (auto generated)");
-        }
-        else if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("GOOD NIGHT")||em.contains("Good night")||em.contains("good night")||em.contains("Good Night")) && bot==1)
-        {
-            auto++;
-            User b = new User(em + "*%SEEN%*");
-            db.child(k).setValue(b);
-            addChat(a+"\\"+"Good Night (auto generated)");
-        }
-        else if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("HELLO")||em.contains("Hello")||em.contains("hello")) && bot==1)
-        {
-            auto++;
-            User b = new User(em + "*%SEEN%*");
-            db.child(k).setValue(b);
-            addChat(a+"\\"+"Hello (auto generated)");
-        }
-        else if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("BYE")||em.contains("Bye")||em.contains("bye")) && bot==1)
-        {
-            auto++;
-            User b = new User(em + "*%SEEN%*");
-            db.child(k).setValue(b);
-            addChat(a+"\\"+"Bye (auto generated)");
-        }
-        else if((auto==0)&&(!em.contains("*%SEEN%*"))&&(!em.contains("(auto generated)"))&&(em.contains("THANK YOU")||em.contains("Thank you")||em.contains("thank you") ||em.contains("Thank You")||em.contains("Thanks")||em.contains("thanks")) && bot==1)
-        {
-            auto++;
-            User b = new User(em + "*%SEEN%*");
-            db.child(k).setValue(b);
-            addChat(a+"\\"+"Welcome (auto generated)");
-        }
-        else {
-            auto=0;
-            User b = new User(em + "*%SEEN%*");
-            db.child(k).setValue(b);
-        }
-    }
- */
+
     public void addChat(String n) throws IOException {
-        if(c==0)
-        {
-            User b=new User("Unblock");
-            db.child(a+"\\"+"BLOCK").setValue(b);
-            db.child(p+"\\"+"BLOCK").setValue(b);
-        }
         String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
         String currentTime = new SimpleDateFormat("hh:mm aa", Locale.getDefault()).format(new Date());
-        String currentTime2 = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+        //String currentTime2 = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
         if(n.contains("^BLOCK^")) {
             User b = new User("Block");
             db.child(a+"\\"+"BLOCK").setValue(b);
@@ -793,6 +513,10 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v) {
         if(v==b)
         {
+            if(blocks.contains(fname)){
+                Toast.makeText(getApplicationContext(), "Please unblock at first", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if(fl==1) {
                 String n = text.getText().toString();
                 if (n.length() == 0) {
@@ -834,8 +558,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                 AlertDialog.Builder alt=new AlertDialog.Builder(this);
                 alt.setTitle("Warning!")
                         .setCancelable(false)
-                        .setMessage("Are you sure you want to delete the chats?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        .setMessage("Are you sure you want to clear the chats from your phone? If you want to delete your unread chats for everyone,cancel this, go to home page and long press on the chat.")
+                        .setPositiveButton("Clear Chats", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
@@ -848,7 +572,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                 }
                             }
                         })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
@@ -864,19 +588,20 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                 }
                 return true;
             case R.id.item6:
-                if(item.getTitle().equals("Block")) {
+                /*if(item.getTitle().equals("Block")) {
                     try {
                         chatbase(a, p);
                     } catch (IOException e) {
 
                     }
                     try {
+                        Toast.makeText(getApplicationContext(), "Blocked", Toast.LENGTH_SHORT).show();
+                        item.setTitle("Unblock");
                         addChat(a + "\\" + "^BLOCK^");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    Toast.makeText(getApplicationContext(), "Blocked", Toast.LENGTH_SHORT).show();
-                    item.setTitle("Unblock");
+
                 }
                 else if(item.getTitle().equals("Unblock")) {
                     try {
@@ -885,17 +610,56 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                         e.printStackTrace();
                     }
                     try {
+                        Toast.makeText(getApplicationContext(), "Unblocked", Toast.LENGTH_SHORT).show();
+                        item.setTitle("Block");
                         addChat(a + "\\" + "^UNBLOCK^");
                     } catch (IOException e) {
 
                     }
-                    Toast.makeText(getApplicationContext(), "Unblocked", Toast.LENGTH_SHORT).show();
-                    item.setTitle("Block");
+
                 }
                 if(bl==1)
                     item.setTitle("Unblock");
                 else if(bl==0)
                     item.setTitle("Block");
+
+                 */
+                if(item.getTitle().equals("Block")){
+                    blocks.add(fname);
+                    String gg="";
+                    try {
+                        FileOutputStream fos=openFileOutput(fblock,MODE_PRIVATE);
+                        for(String blocklist:blocks){
+                            gg=gg+blocklist+"\n";
+                        }
+                        fos.write(gg.getBytes());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(getApplicationContext(),"Blocked",Toast.LENGTH_SHORT).show();
+                    activityOnline=0;
+                    finish();
+                    startActivity(new Intent(getApplicationContext(),ChatBox.class));
+
+                }
+                else if(item.getTitle().equals("Unblock")){
+                    blocks.remove(fname);
+                    String gg="";
+                    try {
+                        FileOutputStream fos=openFileOutput(fblock,MODE_PRIVATE);
+                        for(String blocklist:blocks){
+                            gg=gg+blocklist+"\n";
+                        }
+                        fos.write(gg.getBytes());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(getApplicationContext(),"Unblocked",Toast.LENGTH_SHORT).show();
+                    activityOnline=0;
+                    finish();
+                    startActivity(new Intent(getApplicationContext(),ChatBox.class));
+
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
