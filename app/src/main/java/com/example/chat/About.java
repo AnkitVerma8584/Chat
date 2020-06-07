@@ -12,14 +12,16 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-public class About extends AppCompatActivity {
+public class About extends AppCompatActivity implements View.OnClickListener{
 
-    TextView feed;
+    TextView feed,call,mail;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         getSupportActionBar().hide();
+        call=findViewById(R.id.textView10);
+        mail=findViewById(R.id.textView12);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -33,11 +35,33 @@ public class About extends AppCompatActivity {
                 startActivity(browserIntent);
             }
         });
+        call.setOnClickListener(this);
+        mail.setOnClickListener(this);
     }
 
     @Override
     public void onBackPressed() {
         finish();
         startActivity(new Intent(getApplicationContext(),ChatBox.class));
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v==call)
+        {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:+91 801-357-6138"));
+            startActivity(intent);
+        }
+        if(v==mail){
+            String to="subhopriyo153@gmail.com";
+            Intent email = new Intent(Intent.ACTION_SEND);
+            email.putExtra(Intent.EXTRA_EMAIL, new String[]{ to});
+            email.putExtra(Intent.EXTRA_SUBJECT, "Chatable Application");
+            email.putExtra(Intent.EXTRA_TEXT, "");
+            email.setType("message/rfc822");
+
+            startActivity(Intent.createChooser(email, "Choose an Email client :"));
+        }
     }
 }
