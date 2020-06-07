@@ -63,6 +63,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     int activityOnline;
     String unread="";
     List<String> un=new ArrayList<>();
+    String autotext="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -266,6 +267,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                             if(!check(ss) && activityOnline==1)
                             {
                                 fos.write((ss + "\n").getBytes());
+                                autotext=ss;
                             }
                             if(activityOnline==1)
                             {
@@ -282,6 +284,62 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                             scr.fullScroll(View.FOCUS_DOWN);
                         }
                     });
+                }
+                String time = new SimpleDateFormat("HH", Locale.getDefault()).format(new Date());
+                int t=Integer.parseInt(time);
+                if((autotext.contains("good morning") || autotext.contains("Good morning") || autotext.contains("Good Morning") || autotext.contains("GOOD MORNING"))&& bot==1 && (t>=4 && t<12) ) {
+
+                    autotext = "";
+                    try {
+                        addChat(a+"\\"+"Good Morning (Crypton)");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if((autotext.contains("good afternoon") || autotext.contains("Good Afternoon") || autotext.contains("Good afternoon") || autotext.contains("GOOD AFTERNOON"))&& bot==1 && (t>=12 && t<16)) {
+
+                    autotext = "";
+                    try {
+                        addChat(a+"\\"+"Good Afternoon (Crypton)");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if((autotext.contains("good evening") || autotext.contains("Good Evening") || autotext.contains("Good evening") || autotext.contains("GOOD EVENING"))&& bot==1 && (t>=16 && t<20)) {
+
+                    autotext = "";
+                    try {
+                        addChat(a+"\\"+"Good Evening (Crypton)");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if((autotext.contains("good night") || autotext.contains("Good night") || autotext.contains("Good Night") || autotext.contains("GOOD NIGHT"))&& bot==1 && (t>=20 || t<3)) {
+
+                    autotext = "";
+                    try {
+                        addChat(a+"\\"+"Good Night (Crypton)");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if((autotext.contains("hello") || autotext.contains("Hello") || autotext.contains("HELLO"))&& bot==1 ) {
+
+                    autotext = "";
+                    try {
+                        addChat(a+"\\"+"Hello (Crypton)");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if((autotext.contains("thank you") || autotext.contains("thanks") || autotext.contains("Thank You") || autotext.contains("Thank you") || autotext.contains("Thanks") || autotext.contains("THANK YOU") || autotext.contains("THANKS"))&& bot==1 && (t>=20 || t<3)) {
+
+                    autotext = "";
+                    try {
+                        addChat(a+"\\"+"Welcome (Crypton)");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
