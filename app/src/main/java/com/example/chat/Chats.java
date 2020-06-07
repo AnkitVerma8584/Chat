@@ -136,9 +136,28 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                     User u2=ds2.getValue(User.class);
                     if(u2.email.contains(a+"\\"))
                     {
+
                         unread=unread+u2.email;
                         //un.add(u2.email);
                     }
+                    /*if (u2.email.contains(p + "\\")) {
+                        String z = (u2.email.substring(u2.email.indexOf('\\') + 1));
+                        LayoutInflater inflater = getLayoutInflater();
+                        View v = inflater.inflate(R.layout.left_chat, null);
+                        TextView tvt = v.findViewById(R.id.l_message);
+                        if (z.indexOf('$') > -1) {
+                            String p;
+                            p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
+                            SpannableString spannableString = new SpannableString(p);
+                            spannableString.setSpan(new RelativeSizeSpan(0.6f), p.indexOf(':') - 2, p.length(), 0);
+                            spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':') - 2, p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            tvt.setText(spannableString);
+                        } else {
+                            tvt.setText(z);
+                        }
+                        c++;
+                        t.addView(v);
+                    }*/
                 }
 
                 FileInputStream fis=null;
@@ -213,9 +232,14 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                             scr.fullScroll(View.FOCUS_DOWN);
                         }
                     });
+
+                }
+                catch(Exception e){
+                    //Toast.makeText(getApplicationContext(),"File Doesnt exist",Toast.LENGTH_SHORT).show();
+                }
+                finally{
                     newChats();
                 }
-                catch(Exception e){}
 
             }
 

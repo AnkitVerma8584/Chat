@@ -61,6 +61,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
     int c=100;
     Display display;
     String allname="";
+    String hh="";
     //LoadingDialog loadingDialog=new LoadingDialog(ChatBox.this);
     ScrollView scr;
     int fl=0,unseen_message=0,first_time=0;
@@ -69,6 +70,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
     String name[];
     List<String> last=new ArrayList<>();
     String lastChat="";
+    String a="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +92,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
         flab=findViewById(R.id.fab);
         flab.setOnClickListener(this);
         first_time=0;
+        a=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
         if(flag==0) {
             load();
         }
@@ -98,9 +101,8 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
 
     public void load()
     {
-        String jj="";
         lastChat="_"+auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
-        FileInputStream fis2=null;
+        /*FileInputStream fis2=null;
         try{
             fis2=openFileInput(lastChat);
             InputStreamReader isr=new InputStreamReader(fis2);
@@ -109,13 +111,66 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
             while((p1=br.readLine())!=null){
                 last.add(p1);
             }
+        }catch(Exception e){}*/
+        last.clear();hh="";
+        FileInputStream fis2=null;
+        try{
+            fis2=openFileInput(lastChat);
+            InputStreamReader isr=new InputStreamReader(fis2);
+            BufferedReader br=new BufferedReader(isr);
+            int gl=0;String p1="";
+            while((p1=br.readLine())!=null){
+                gl=0;
+                for(String s4:last) {
+                    if(p1.equals(s4))
+                    {
+                        gl=1;
+                        break;
+                    }
+                }
+                if(gl==0)
+                    last.add(p1);
+            }
         }catch(Exception e){}
-        display();
+        db.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot dd:dataSnapshot.getChildren()){
+                    String zz=dd.getKey();
+                    String t1=zz.substring(0,zz.indexOf('^')),t2=zz.substring(zz.indexOf('^')+1);
+
+                    if(t1.equals(a) || t2.equals(a))
+                    {
+                        int gl=0;
+                        for(String s4:last) {
+                            if(dd.getKey().equals(s4))
+                            {
+                                gl=1;
+                                break;
+                            }
+                        }
+                        if(gl==0)
+                        {
+                            last.add(0,dd.getKey());
+                            hh=hh+dd.getKey();
+                        }
+                    }
+                }
+
+                display();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void display(){
         try {
             t.removeAllViews();
+            flab.setVisibility(View.VISIBLE);
             scr.setBackgroundColor(Color.WHITE);
             fl=0;
             c=100;
@@ -203,7 +258,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
 
     /*public void begin(){
         fl=0;
-        flab.setVisibility(View.VISIBLE);
+
         try {
             loadingDialog.startLoadingDialog();
             dl.addValueEventListener(new ValueEventListener() {
@@ -493,7 +548,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                         try {
                             Glide.with(getApplicationContext()).load(u.l).into(civ);
                         } catch (Exception e) {
-                            display();
+                            load();
                         }
                         Point size=new Point();
                         display.getSize(size);
@@ -678,14 +733,14 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
                         txt.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                display();
+                                load();
                             }
                         });
                     }
                 });
             } catch (Exception e) {
                 Toast.makeText(getApplicationContext(),"Picture changed",Toast.LENGTH_SHORT).show();
-                display();
+                load();
             }
 
         }
@@ -727,7 +782,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
             finishAffinity();
         }
         else if(fl==1){
-            display();
+            load();
         }
 
     }
