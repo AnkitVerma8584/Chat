@@ -54,7 +54,7 @@ public class MorePeople extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_box);
-        getSupportActionBar().setTitle("Chatable: Registered People");
+        getSupportActionBar().setTitle("Global");
         auth = FirebaseAuth.getInstance();
         t = findViewById(R.id.table);
         db = FirebaseDatabase.getInstance().getReference().child("ChatBox");

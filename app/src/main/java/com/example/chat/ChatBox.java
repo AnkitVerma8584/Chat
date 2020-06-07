@@ -266,7 +266,7 @@ public class ChatBox extends AppCompatActivity implements NewChat.NewChatListene
             Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
         }
     }
-    
+
     public void getname(final String n,final int t)
     {
         df.addValueEventListener(new ValueEventListener() {

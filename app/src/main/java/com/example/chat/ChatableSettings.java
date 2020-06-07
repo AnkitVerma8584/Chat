@@ -28,6 +28,7 @@ public class ChatableSettings extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chatable_settings);
+        getSupportActionBar().setTitle("Settings");
         s1=findViewById(R.id.switch1);
         s2=findViewById(R.id.switch2);
         auth=FirebaseAuth.getInstance();

@@ -300,7 +300,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                 }
                 String time = new SimpleDateFormat("HH", Locale.getDefault()).format(new Date());
                 int t=Integer.parseInt(time);
-                if((autotext.contains("good morning") || autotext.contains("Good morning") || autotext.contains("Good Morning") || autotext.contains("GOOD MORNING"))&& bot==1 && (t>=4 && t<12) ) {
+                if(!autotext.contains(" (Crypton)") && (autotext.contains("good morning") || autotext.contains("Good morning") || autotext.contains("Good Morning") || autotext.contains("GOOD MORNING"))&& bot==1 && (t>=4 && t<12) ) {
 
                     autotext = "";
                     try {
@@ -309,7 +309,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                         e.printStackTrace();
                     }
                 }
-                else if((autotext.contains("good afternoon") || autotext.contains("Good Afternoon") || autotext.contains("Good afternoon") || autotext.contains("GOOD AFTERNOON"))&& bot==1 && (t>=12 && t<16)) {
+                else if(!autotext.contains(" (Crypton)") && (autotext.contains("good afternoon") || autotext.contains("Good Afternoon") || autotext.contains("Good afternoon") || autotext.contains("GOOD AFTERNOON"))&& bot==1 && (t>=12 && t<16)) {
 
                     autotext = "";
                     try {
@@ -318,7 +318,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                         e.printStackTrace();
                     }
                 }
-                else if((autotext.contains("good evening") || autotext.contains("Good Evening") || autotext.contains("Good evening") || autotext.contains("GOOD EVENING"))&& bot==1 && (t>=16 && t<20)) {
+                else if(!autotext.contains(" (Crypton)") && (autotext.contains("good evening") || autotext.contains("Good Evening") || autotext.contains("Good evening") || autotext.contains("GOOD EVENING"))&& bot==1 && (t>=16 && t<20)) {
 
                     autotext = "";
                     try {
@@ -327,7 +327,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                         e.printStackTrace();
                     }
                 }
-                else if((autotext.contains("good night") || autotext.contains("Good night") || autotext.contains("Good Night") || autotext.contains("GOOD NIGHT"))&& bot==1 && (t>=20 || t<3)) {
+                else if(!autotext.contains(" (Crypton)") && (autotext.contains("good night") || autotext.contains("Good night") || autotext.contains("Good Night") || autotext.contains("GOOD NIGHT"))&& bot==1 && (t>=20 || t<3)) {
 
                     autotext = "";
                     try {
@@ -336,7 +336,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                         e.printStackTrace();
                     }
                 }
-                else if((autotext.contains("hello") || autotext.contains("Hello") || autotext.contains("HELLO"))&& bot==1 ) {
+                else if(!autotext.contains(" (Crypton)") && (autotext.contains("hello") || autotext.contains("Hello") || autotext.contains("HELLO"))&& bot==1 ) {
 
                     autotext = "";
                     try {
@@ -345,7 +345,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                         e.printStackTrace();
                     }
                 }
-                else if((autotext.contains("thank you") || autotext.contains("thanks") || autotext.contains("Thank You") || autotext.contains("Thank you") || autotext.contains("Thanks") || autotext.contains("THANK YOU") || autotext.contains("THANKS"))&& bot==1 && (t>=20 || t<3)) {
+                else if(!autotext.contains(" (Crypton)") && (autotext.contains("thank you") || autotext.contains("thanks") || autotext.contains("Thank You") || autotext.contains("Thank you") || autotext.contains("Thanks") || autotext.contains("THANK YOU") || autotext.contains("THANKS"))&& bot==1 && (t>=20 || t<3)) {
 
                     autotext = "";
                     try {
