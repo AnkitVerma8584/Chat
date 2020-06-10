@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
@@ -109,7 +110,13 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         text=findViewById(R.id.editText3);
         scr=findViewById(R.id.scrollView2);
         ud=FirebaseDatabase.getInstance().getReference().child("Last");
-
+        scr.post(new Runnable() {
+            @Override
+            public void run() {
+                scr.fullScroll(View.FOCUS_DOWN);
+            }
+        });
+        scr.fullScroll(ScrollView.FOCUS_DOWN);
         try {
             chatbase(a,p);
         } catch (IOException e) {
@@ -194,7 +201,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                     String p;
                                     p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
                                     SpannableString spannableString = new SpannableString(p);
-                                    spannableString.setSpan(new RelativeSizeSpan(0.6f), p.indexOf(':') - 2, p.length(), 0);
+                                    spannableString.setSpan(new RelativeSizeSpan(0.6f), p.lastIndexOf(':') - 2, p.length(), 0);
                                     spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':') - 2, p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                                     tvt.setText(spannableString);
                                 } else
@@ -208,7 +215,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                     String p;
                                     p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
                                     SpannableString spannableString = new SpannableString(p);
-                                    spannableString.setSpan(new RelativeSizeSpan(0.6f), p.indexOf(':') - 2, p.length(), 0);
+                                    spannableString.setSpan(new RelativeSizeSpan(0.6f), p.lastIndexOf(':') - 2, p.length(), 0);
                                     spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':') - 2, p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                                     tvt.setText(spannableString);
                                 } else {
@@ -227,7 +234,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                 String p;
                                 p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
                                 SpannableString spannableString = new SpannableString(p);
-                                spannableString.setSpan(new RelativeSizeSpan(0.6f), p.indexOf(':') - 2, p.length(), 0);
+                                spannableString.setSpan(new RelativeSizeSpan(0.6f), p.lastIndexOf(':') - 2, p.length(), 0);
                                 spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':') - 2, p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                                 tvt.setText(spannableString);
                             } else {
@@ -300,56 +307,56 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                 }
                 String time = new SimpleDateFormat("HH", Locale.getDefault()).format(new Date());
                 int t=Integer.parseInt(time);
-                if(!autotext.contains(" (Crypton)") && (autotext.contains("good morning") || autotext.contains("Good morning") || autotext.contains("Good Morning") || autotext.contains("GOOD MORNING"))&& bot==1 && (t>=4 && t<12) ) {
+                if(!autotext.contains("Crypton says- ") && (autotext.contains("good morning") || autotext.contains("Good morning") || autotext.contains("Good Morning") || autotext.contains("GOOD MORNING"))&& bot==1 && (t>=4 && t<12) ) {
 
                     autotext = "";
                     try {
-                        addChat(a+"\\"+"Good Morning (Crypton)");
+                        addChat(a+"\\"+"Crypton says- Good Morning");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-                else if(!autotext.contains(" (Crypton)") && (autotext.contains("good afternoon") || autotext.contains("Good Afternoon") || autotext.contains("Good afternoon") || autotext.contains("GOOD AFTERNOON"))&& bot==1 && (t>=12 && t<16)) {
+                else if(!autotext.contains("Crypton says- ") && (autotext.contains("good afternoon") || autotext.contains("Good Afternoon") || autotext.contains("Good afternoon") || autotext.contains("GOOD AFTERNOON"))&& bot==1 && (t>=12 && t<16)) {
 
                     autotext = "";
                     try {
-                        addChat(a+"\\"+"Good Afternoon (Crypton)");
+                        addChat(a+"\\"+"Crypton says- Good Afternoon");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-                else if(!autotext.contains(" (Crypton)") && (autotext.contains("good evening") || autotext.contains("Good Evening") || autotext.contains("Good evening") || autotext.contains("GOOD EVENING"))&& bot==1 && (t>=16 && t<20)) {
+                else if(!autotext.contains("Crypton says- ") && (autotext.contains("good evening") || autotext.contains("Good Evening") || autotext.contains("Good evening") || autotext.contains("GOOD EVENING"))&& bot==1 && (t>=16 && t<20)) {
 
                     autotext = "";
                     try {
-                        addChat(a+"\\"+"Good Evening (Crypton)");
+                        addChat(a+"\\"+"Crypton says- Good Evening");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-                else if(!autotext.contains(" (Crypton)") && (autotext.contains("good night") || autotext.contains("Good night") || autotext.contains("Good Night") || autotext.contains("GOOD NIGHT"))&& bot==1 && (t>=20 || t<3)) {
+                else if(!autotext.contains("Crypton says- ") && (autotext.contains("good night") || autotext.contains("Good night") || autotext.contains("Good Night") || autotext.contains("GOOD NIGHT"))&& bot==1 && (t>=20 || t<3)) {
 
                     autotext = "";
                     try {
-                        addChat(a+"\\"+"Good Night (Crypton)");
+                        addChat(a+"\\"+"Crypton says- Good Night");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-                else if(!autotext.contains(" (Crypton)") && (autotext.contains("hello") || autotext.contains("Hello") || autotext.contains("HELLO"))&& bot==1 ) {
+                else if(!autotext.contains("Crypton says- ") && (autotext.contains("hello") || autotext.contains("Hello") || autotext.contains("HELLO"))&& bot==1 ) {
 
                     autotext = "";
                     try {
-                        addChat(a+"\\"+"Hello (Crypton)");
+                        addChat(a+"\\"+"Crypton says- Hello");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-                else if(!autotext.contains(" (Crypton)") && (autotext.contains("thank you") || autotext.contains("thanks") || autotext.contains("Thank You") || autotext.contains("Thank you") || autotext.contains("Thanks") || autotext.contains("THANK YOU") || autotext.contains("THANKS"))&& bot==1 && (t>=20 || t<3)) {
+                else if(!autotext.contains("Crypton says- ") && (autotext.contains("thank you") || autotext.contains("thanks") || autotext.contains("Thank You") || autotext.contains("Thank you") || autotext.contains("Thanks") || autotext.contains("THANK YOU") || autotext.contains("THANKS"))&& bot==1 && (t>=20 || t<3)) {
 
                     autotext = "";
                     try {
-                        addChat(a+"\\"+"Welcome (Crypton)");
+                        addChat(a+"\\"+"Crypton says- Welcome");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -394,6 +401,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         }
         return false;
     }
+
+
 
     public void addChat(String n) throws IOException {
         String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
@@ -477,29 +486,6 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
-    public String commonChatBoxName(String a1,String p1){
-        int i=0;String n="";
-        while(i<a1.length() && i<p1.length())
-        {
-            if((int)(a1.charAt(i))<(int)(p1.charAt(i)))
-            {
-                n=""+(a1+"^"+p1);
-                break;
-            }
-            else if((int)(a1.charAt(i))>(int)(p1.charAt(i)))
-            {
-                n=""+(p1+"^"+a1);
-                break;
-            }else{
-                if(a1.length()<p1.length())
-                    n=""+(a1+"^"+p1);
-                else
-                    n=""+(p1+"^"+a1);
-            }
-            i++;
-        }
-        return n;
-    }
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onBackPressed() {
