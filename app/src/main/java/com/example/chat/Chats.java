@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -67,6 +68,9 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     String autotext="";
     String fblock="blockList";
     List<String> blocks=new ArrayList<>();
+    List<Integer> reply=new ArrayList<>();
+    int row=0;
+    TextView re;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +82,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         auth=FirebaseAuth.getInstance();
         getSupportActionBar().setTitle(t1);
         t=findViewById(R.id.table);
+        re=findViewById(R.id.reply);
+        re.setVisibility(View.INVISIBLE);
         try {
             FileInputStream fis = openFileInput(fblock);
             String string;
@@ -121,6 +127,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             chatbase(a,p);
         } catch (IOException e) {
         }
+
     }
 
     public void chatbase(String a1, String p1) throws IOException {
@@ -195,8 +202,94 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                             LayoutInflater inflater = getLayoutInflater();
 
                             if (!g.contains(text)) {
-                                View v = inflater.inflate(R.layout.seen, null);
-                                TextView tvt = v.findViewById(R.id.r_message);
+                                if (z.contains("...R\\")){
+                                    View v = inflater.inflate(R.layout.seenreply, null);
+                                    TextView tvt = v.findViewById(R.id.message);
+                                    TextView tvt2=v.findViewById(R.id.remessage);
+                                    tvt2.setText(z.substring(0,z.indexOf("R\\")));
+                                    z=z.substring(z.indexOf("R\\")+2);
+                                    if (z.indexOf('$') > -1) {
+                                        String p;
+                                        p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
+                                        SpannableString spannableString = new SpannableString(p);
+                                        spannableString.setSpan(new RelativeSizeSpan(0.6f), p.lastIndexOf(':') - 2, p.length(), 0);
+                                        spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':') - 2, p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        tvt.setText(spannableString);
+                                    } else
+                                        tvt.setText(z);
+                                    t.addView(v);
+                                    row++;
+                                    reply.add(v.getId());
+                                }
+                                else {
+                                    View v = inflater.inflate(R.layout.seen, null);
+                                    TextView tvt = v.findViewById(R.id.message);
+                                    if (z.indexOf('$') > -1) {
+                                        String p;
+                                        p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
+                                        SpannableString spannableString = new SpannableString(p);
+                                        spannableString.setSpan(new RelativeSizeSpan(0.6f), p.lastIndexOf(':') - 2, p.length(), 0);
+                                        spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':') - 2, p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        tvt.setText(spannableString);
+                                    } else
+                                        tvt.setText(z);
+                                    t.addView(v);
+                                    row++;
+                                    reply.add(v.getId());
+                                }
+                            } else {
+                                //Toast.makeText(getApplicationContext(), unread, Toast.LENGTH_SHORT).show();
+
+                                if (z.contains("...R\\")){
+                                    View v = inflater.inflate(R.layout.right_chat_reply, null);
+                                    TextView tvt = v.findViewById(R.id.message);
+                                    TextView tvt2=v.findViewById(R.id.remessage);
+                                    tvt2.setText(z.substring(0,z.indexOf("R\\")));
+                                    z=z.substring(z.indexOf("R\\")+2);
+                                    if (z.indexOf('$') > -1) {
+                                        String p;
+                                        p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
+                                        SpannableString spannableString = new SpannableString(p);
+                                        spannableString.setSpan(new RelativeSizeSpan(0.6f), p.lastIndexOf(':') - 2, p.length(), 0);
+                                        spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':') - 2, p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        tvt.setText(spannableString);
+                                    } else {
+                                        tvt.setText(z);
+                                    }
+                                    t.addView(v);
+                                    row++;
+                                    reply.add(v.getId());
+                                }
+                                else {
+                                    View v = inflater.inflate(R.layout.right_chat, null);
+                                    TextView tvt = v.findViewById(R.id.message);
+                                    if (z.indexOf('$') > -1) {
+                                        String p;
+                                        p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
+                                        SpannableString spannableString = new SpannableString(p);
+                                        spannableString.setSpan(new RelativeSizeSpan(0.6f), p.lastIndexOf(':') - 2, p.length(), 0);
+                                        spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':') - 2, p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        tvt.setText(spannableString);
+                                    } else {
+                                        tvt.setText(z);
+                                    }
+                                    t.addView(v);
+                                    row++;
+                                    reply.add(v.getId());
+                                }
+                            }
+                            c++;
+
+                        } else if (text.contains(p + "\\")) {
+                            String z = (text.substring(text.indexOf('\\') + 1));
+                            LayoutInflater inflater = getLayoutInflater();
+
+                            if (z.contains("...R\\")){
+                                View v = inflater.inflate(R.layout.left_chat_reply, null);
+                                TextView tvt = v.findViewById(R.id.message);
+                                TextView tvt2=v.findViewById(R.id.remessage);
+                                tvt2.setText(z.substring(0,z.indexOf("R\\")));
+                                z=z.substring(z.indexOf("R\\")+2);
                                 if (z.indexOf('$') > -1) {
                                     String p;
                                     p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
@@ -207,10 +300,12 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                 } else
                                     tvt.setText(z);
                                 t.addView(v);
-                            } else {
-                                //Toast.makeText(getApplicationContext(), unread, Toast.LENGTH_SHORT).show();
-                                View v = inflater.inflate(R.layout.right_chat, null);
-                                TextView tvt = v.findViewById(R.id.r_message);
+                                row++;
+                                reply.add(v.getId());
+                            }
+                            else {
+                                View v = inflater.inflate(R.layout.left_chat, null);
+                                TextView tvt = v.findViewById(R.id.message);
                                 if (z.indexOf('$') > -1) {
                                     String p;
                                     p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
@@ -221,27 +316,11 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                 } else {
                                     tvt.setText(z);
                                 }
+                                c++;
                                 t.addView(v);
+                                row++;
+                                reply.add(v.getId());
                             }
-                            c++;
-
-                        } else if (text.contains(p + "\\")) {
-                            String z = (text.substring(text.indexOf('\\') + 1));
-                            LayoutInflater inflater = getLayoutInflater();
-                            View v = inflater.inflate(R.layout.left_chat, null);
-                            TextView tvt = v.findViewById(R.id.l_message);
-                            if (z.indexOf('$') > -1) {
-                                String p;
-                                p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
-                                SpannableString spannableString = new SpannableString(p);
-                                spannableString.setSpan(new RelativeSizeSpan(0.6f), p.lastIndexOf(':') - 2, p.length(), 0);
-                                spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':') - 2, p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                tvt.setText(spannableString);
-                            } else {
-                                tvt.setText(z);
-                            }
-                            c++;
-                            t.addView(v);
 
                         }
                         unread = "";
@@ -258,8 +337,10 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                     //Toast.makeText(getApplicationContext(),"File Doesnt exist",Toast.LENGTH_SHORT).show();
                 }
                 finally{
+                    checkReply();
                     if(!blocks.contains(fname))
                         newChats();
+
                 }
 
             }
@@ -271,6 +352,33 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         });
         //show();
         //viewChat();
+    }
+    public void checkReply(){
+        for(int i=0;i<row;i++){
+            View v=t.getChildAt(i);
+            try{
+            final TextView tv=v.findViewById(R.id.message);
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Toast.makeText(getApplicationContext(),tv.getText().toString().substring(0,tv.getText().toString().length()-8).trim(),Toast.LENGTH_SHORT).show();
+                    String nn=tv.getText().toString().substring(0,tv.getText().toString().length()-8).trim();
+                    if(nn.length()>100)
+                        nn=nn.substring(0,100)+"...";
+                    else
+                        nn=nn+"...";
+                    re.setText(nn+"\n\n");
+                    re.setVisibility(View.VISIBLE);
+                    scr.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            scr.fullScroll(View.FOCUS_DOWN);
+                        }
+                    });
+
+                }
+            });}catch (Exception e){}
+        }
     }
 
     public void newChats(){
@@ -423,10 +531,10 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             dbr.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Details detail=dataSnapshot.getValue(Details.class);
+                    Details detail = dataSnapshot.getValue(Details.class);
                     try {
-                        if(detail.soundEffect==1){
-                            MediaPlayer ring= MediaPlayer.create(getApplicationContext(),R.raw.sent);
+                        if (detail.soundEffect == 1) {
+                            MediaPlayer ring = MediaPlayer.create(getApplicationContext(), R.raw.sent);
                             ring.start();
                         }
                     } catch (Exception e) {
@@ -442,53 +550,77 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             db.child("LAST").setValue(u2);
             u=new User(commonChatBoxName(a,p));
             ud.child(""+currentDate + "*" + currentTime2).setValue(u);*/
-            final FileOutputStream fos=openFileOutput(fname,MODE_APPEND);
-            fos.write((n+"\n").getBytes());
+            final FileOutputStream fos = openFileOutput(fname, MODE_APPEND);
+            fos.write((n + "\n").getBytes());
 
             String z = (n.substring(n.indexOf('\\') + 1));
             LayoutInflater inflater = getLayoutInflater();
-
-            View v = inflater.inflate(R.layout.right_chat, null);
-            TextView tvt = v.findViewById(R.id.r_message);
-            if (z.indexOf('$') > -1)
-            {
-                String p;
-                p=z.substring(0, z.indexOf('$'))+"    "+z.substring(z.indexOf('#')+1);
-                SpannableString spannableString=new SpannableString(p);
-                spannableString.setSpan(new RelativeSizeSpan(0.6f),p.indexOf(':')-2,p.length(),0);
-                spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':')-2,p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                tvt.setText(spannableString);
+            if (z.contains("...R\\")) {
+                View v = inflater.inflate(R.layout.right_chat_reply, null);
+                TextView tvt = v.findViewById(R.id.message);
+                TextView tvtv=v.findViewById(R.id.remessage);
+                tvtv.setText(z.substring(0,z.indexOf("R\\")));
+                z=z.substring(z.indexOf("R\\")+2);
+                if (z.indexOf('$') > -1) {
+                    String p;
+                    p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
+                    SpannableString spannableString = new SpannableString(p);
+                    spannableString.setSpan(new RelativeSizeSpan(0.6f), p.indexOf(':') - 2, p.length(), 0);
+                    spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':') - 2, p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    tvt.setText(spannableString);
+                } else
+                    tvt.setText(z);
+                t.addView(v);
+                row++;
+                reply.add(v.getId());
+            } else {
+                View v = inflater.inflate(R.layout.right_chat, null);
+                TextView tvt = v.findViewById(R.id.message);
+                if (z.indexOf('$') > -1) {
+                    String p;
+                    p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
+                    SpannableString spannableString = new SpannableString(p);
+                    spannableString.setSpan(new RelativeSizeSpan(0.6f), p.indexOf(':') - 2, p.length(), 0);
+                    spannableString.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE), p.indexOf(':') - 2, p.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    tvt.setText(spannableString);
+                } else
+                    tvt.setText(z);
+                t.addView(v);
+                row++;
+                reply.add(v.getId());
             }
-            else
-                tvt.setText(z);
-            t.addView(v);
             //Updating the last person messaged list
-            List<String> last=new ArrayList<>();
-            FileInputStream fis2=null;
-            try{
-                fis2=openFileInput(lastChat);
-                InputStreamReader isr=new InputStreamReader(fis2);
-                BufferedReader br=new BufferedReader(isr);
-                String p1="";
-                while((p1=br.readLine())!=null){
+            List<String> last = new ArrayList<>();
+            FileInputStream fis2 = null;
+            try {
+                fis2 = openFileInput(lastChat);
+                InputStreamReader isr = new InputStreamReader(fis2);
+                BufferedReader br = new BufferedReader(isr);
+                String p1 = "";
+                while ((p1 = br.readLine()) != null) {
                     last.add(p1);
                 }
-            }catch(Exception e){}
-            FileOutputStream fos2=openFileOutput(lastChat,MODE_PRIVATE);
-            String p1=fname;
-            for(String name:last){
-                if(!p1.contains(name))
-                    p1=p1+"\n"+name;
+            }catch (Exception e) {
+            }
+            FileOutputStream fos2 = openFileOutput(lastChat, MODE_PRIVATE);
+            String p1 = fname;
+            for (String name : last) {
+                if (!p1.contains(name))
+                    p1 = p1 + "\n" + name;
             }
             fos2.write(p1.getBytes());
-
-            //chatbase(a,p);
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onBackPressed() {
+        if(re.getVisibility()==View.VISIBLE){
+            re.setText("");
+            re.setVisibility(View.INVISIBLE);
+            return;
+        }
+
         finishAndRemoveTask();
         f=1;
         activityOnline=0;
@@ -505,21 +637,33 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             }
             if(fl==1) {
                 String n = text.getText().toString();
+                String nre=re.getText().toString();
                 if (n.length() == 0) {
                     Toast.makeText(getApplicationContext(), "Message cannot be blank", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                text.setText("");
-                text.setHint("Type your message");
-                try {
-                    chatbase(a, p);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    addChat(a + "\\" + n);
-                } catch (IOException e) {
+                if(re.getVisibility()==View.INVISIBLE) {
+                    text.setText("");
+                    text.setHint("Type your message");
+                    try {
+                        addChat(a + "\\" + n);
+                    } catch (IOException e) {
 
+                    }
+                }
+                else{
+                    nre=nre.substring(0,nre.indexOf("\n\n"));
+                    text.setText("");
+                    text.setHint("Type your message");
+                    re.setText("\n");
+                    re.setVisibility(View.INVISIBLE);
+                    while(n.length()<36 && nre.length()>n.length())
+                        n=n+" ";
+                try {
+                        addChat(a + "\\" + nre + "R\\" + n);
+                    } catch (IOException e) {
+
+                    }
                 }
             }
             else
