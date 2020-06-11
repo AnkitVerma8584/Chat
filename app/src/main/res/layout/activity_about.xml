@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:padding="20dp"
-        android:text="Chatable Application \nVersion: 0.2.1\n\u00A9 2020"
+        android:text="Chatable Application \nVersion: 0.2.2\n\u00A9 2020"
         android:textColor="#000000"
         android:textSize="29dp"
         app:layout_constraintEnd_toEndOf="parent"
