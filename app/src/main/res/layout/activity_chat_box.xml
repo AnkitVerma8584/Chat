@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ChatBox">
-
     <ScrollView
         android:id="@+id/full"
         android:paddingTop="10dp"

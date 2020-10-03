@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/back_login"
+    tools:ignore="HardcodedText,Autofill,RtlSymmetry"
     tools:context=".Login">
 
     <TextView
@@ -20,7 +21,8 @@
         app:layout_constraintHorizontal_bias="0.311"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+         />
 
     <EditText
         android:id="@+id/editText"
@@ -36,7 +38,8 @@
         android:paddingStart="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+      />
 
     <Button
         android:id="@+id/button"
@@ -91,7 +94,7 @@
         android:layout_height="45dp"
         android:layout_marginTop="34dp"
         android:text="Resend Verification Email"
-        android:textSize="18dp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button" />

@@ -17,6 +17,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
+
 public class ChatableSettings extends AppCompatActivity {
 
     FirebaseAuth auth;
@@ -28,11 +30,11 @@ public class ChatableSettings extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chatable_settings);
-        getSupportActionBar().setTitle("Settings");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Settings");
         s1=findViewById(R.id.switch1);
         s2=findViewById(R.id.switch2);
         auth=FirebaseAuth.getInstance();
-        String authemail=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
+        String authemail= Objects.requireNonNull(Objects.requireNonNull(auth.getCurrentUser()).getEmail()).substring(0, Objects.requireNonNull(auth.getCurrentUser().getEmail()).indexOf('@'));
         if(authemail.contains("."))
             authemail=authemail.replace('.','!');
         db= FirebaseDatabase.getInstance().getReference().child("Users").child(authemail);
@@ -40,6 +42,7 @@ public class ChatableSettings extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Details d1=dataSnapshot.getValue(Details.class);
+                assert d1 != null;
                 n=d1.n;
                 d=d1.d;
                 s=d1.s;
@@ -70,20 +73,21 @@ public class ChatableSettings extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.save:
-                Details d2;int a,b;
-                if(s1.isChecked())
-                    a=1;
-                else
-                    a=0;
-                if(s2.isChecked())
-                    b=1;
-                else b=0;
-                d2=new Details(n,s,l,d,a,b);
-                db.setValue(d2);
-                Snackbar.make(findViewById(R.id.setting), "Changes Saved", Snackbar.LENGTH_SHORT)
-                        .setAction("Action", null).show();        }
+        if (item.getItemId() == R.id.save) {
+            Details d2;
+            int a, b;
+            if (s1.isChecked())
+                a = 1;
+            else
+                a = 0;
+            if (s2.isChecked())
+                b = 1;
+            else b = 0;
+            d2 = new Details(n, s, l, d, a, b);
+            db.setValue(d2);
+            Snackbar.make(findViewById(R.id.setting), "Changes Saved", Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null).show();
+        }
         return super.onOptionsItemSelected(item);
     }
 

@@ -1,9 +1,6 @@
 package com.example.chat;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,22 +9,27 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-public class About extends AppCompatActivity implements View.OnClickListener{
+import androidx.appcompat.app.AppCompatActivity;
 
-    TextView feed,call,mail;
+import java.util.Objects;
+
+public class About extends AppCompatActivity implements View.OnClickListener {
+
+    TextView feed, call, mail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
-        getSupportActionBar().hide();
-        call=findViewById(R.id.textView10);
-        mail=findViewById(R.id.textView12);
+        Objects.requireNonNull(getSupportActionBar()).hide();
+        call = findViewById(R.id.textView10);
+        mail = findViewById(R.id.textView12);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(0xFF889FEF);
         }
-        feed=findViewById(R.id.feedback);
+        feed = findViewById(R.id.feedback);
         feed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -42,21 +44,20 @@ public class About extends AppCompatActivity implements View.OnClickListener{
     @Override
     public void onBackPressed() {
         finish();
-        startActivity(new Intent(getApplicationContext(),ChatBox.class));
+        startActivity(new Intent(getApplicationContext(), ChatBox.class));
     }
 
     @Override
     public void onClick(View v) {
-        if(v==call)
-        {
+        if (v == call) {
             Intent intent = new Intent(Intent.ACTION_DIAL);
             intent.setData(Uri.parse("tel:+91 801-357-6138"));
             startActivity(intent);
         }
-        if(v==mail){
-            String to="subhopriyo153@gmail.com";
+        if (v == mail) {
+            String to = "subhopriyo153@gmail.com";
             Intent email = new Intent(Intent.ACTION_SEND);
-            email.putExtra(Intent.EXTRA_EMAIL, new String[]{ to});
+            email.putExtra(Intent.EXTRA_EMAIL, new String[]{to});
             email.putExtra(Intent.EXTRA_SUBJECT, "Chatable Application");
             email.putExtra(Intent.EXTRA_TEXT, "");
             email.setType("message/rfc822");

@@ -1,10 +1,6 @@
 package com.example.chat;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -15,22 +11,22 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.AlignmentSpan;
 import android.text.style.RelativeSizeSpan;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.snackbar.Snackbar;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,11 +35,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
@@ -51,38 +44,41 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+
 public class Chats extends AppCompatActivity implements View.OnClickListener {
-    String p,a;
-    DatabaseReference db,ud,dbr;
+    String p, a;
+    DatabaseReference db, ud, dbr;
     FirebaseAuth auth;
     TableLayout t;
     Button b;
     EditText text;
     ScrollView scr;
-    int c=0,fl=1,bl=0,f=0;
-    int bot=0;
-    String fname,lastChat;
+    int c = 0, fl = 1, bl = 0, f = 0;
+    int bot = 0;
+    String fname, lastChat;
     int activityOnline;
-    String unread="";
-    List<String> un=new ArrayList<>();
-    String autotext="";
-    String fblock="blockList";
-    List<String> blocks=new ArrayList<>();
-    List<Integer> reply=new ArrayList<>();
-    int row=0;
+    String unread = "";
+    List<String> un = new ArrayList<>();
+    String autotext = "";
+    String fblock = "blockList";
+    List<String> blocks = new ArrayList<>();
+    List<Integer> reply = new ArrayList<>();
+    int row = 0;
     TextView re;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chats);
-        Intent intent=getIntent();
-        p=intent.getExtras().getString("person");
-        String t1=p.substring(p.indexOf('&')+1);
-        p=p.substring(0,p.indexOf('@'));
-        auth=FirebaseAuth.getInstance();
+        Intent intent = getIntent();
+        p = intent.getExtras().getString("person");
+        String t1 = p.substring(p.indexOf('&') + 1);
+        p = p.substring(0, p.indexOf('@'));
+        auth = FirebaseAuth.getInstance();
         getSupportActionBar().setTitle(t1);
-        t=findViewById(R.id.table);
-        re=findViewById(R.id.reply);
+        t = findViewById(R.id.table);
+        re = findViewById(R.id.reply);
         re.setVisibility(View.INVISIBLE);
         try {
             FileInputStream fis = openFileInput(fblock);
@@ -92,17 +88,19 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                 blocks.add(string);
                 //Toast.makeText(getApplicationContext(),string,Toast.LENGTH_SHORT).show();
             }
-        }catch(Exception e){}
-        a=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
-        if(a.contains("."))
-            a=a.replace('.','!');
-        activityOnline=1;
-        dbr=FirebaseDatabase.getInstance().getReference().child("Users").child(a);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        a = auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
+        if (a.contains("."))
+            a = a.replace('.', '!');
+        activityOnline = 1;
+        dbr = FirebaseDatabase.getInstance().getReference().child("Users").child(a);
         dbr.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Details dd=dataSnapshot.getValue(Details.class);
-                bot=dd.chatbot;
+                Details dd = dataSnapshot.getValue(Details.class);
+                bot = dd.chatbot;
             }
 
             @Override
@@ -111,11 +109,11 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             }
         });
 
-        b=findViewById(R.id.button2);
+        b = findViewById(R.id.button2);
         b.setOnClickListener(this);
-        text=findViewById(R.id.editText3);
-        scr=findViewById(R.id.scrollView2);
-        ud=FirebaseDatabase.getInstance().getReference().child("Last");
+        text = findViewById(R.id.editText3);
+        scr = findViewById(R.id.scrollView2);
+        ud = FirebaseDatabase.getInstance().getReference().child("Last");
         scr.post(new Runnable() {
             @Override
             public void run() {
@@ -124,47 +122,45 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         });
         scr.fullScroll(ScrollView.FOCUS_DOWN);
         try {
-            chatbase(a,p);
+            chatbase(a, p);
         } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
 
     public void chatbase(String a1, String p1) throws IOException {
-        int i=0;String n="";
-        while(i<a1.length() && i<p1.length())
-        {
-            if((int)(a1.charAt(i))<(int)(p1.charAt(i)))
-            {
-                n=""+(a1+"^"+p1);
+        int i = 0;
+        String n = "";
+        while (i < a1.length() && i < p1.length()) {
+            if ((int) (a1.charAt(i)) < (int) (p1.charAt(i))) {
+                n = "" + (a1 + "^" + p1);
                 break;
-            }
-            else if((int)(a1.charAt(i))>(int)(p1.charAt(i)))
-            {
-                n=""+(p1+"^"+a1);
+            } else if ((int) (a1.charAt(i)) > (int) (p1.charAt(i))) {
+                n = "" + (p1 + "^" + a1);
                 break;
-            }else{
-                if(a1.length()<p1.length())
-                    n=""+(a1+"^"+p1);
+            } else {
+                if (a1.length() < p1.length())
+                    n = "" + (a1 + "^" + p1);
                 else
-                    n=""+(p1+"^"+a1);
+                    n = "" + (p1 + "^" + a1);
             }
             i++;
         }
-        db=FirebaseDatabase.getInstance().getReference().child("ChatBox").child(n);
-        fname=n;
+        db = FirebaseDatabase.getInstance().getReference().child("ChatBox").child(n);
+        fname = n;
 
-        lastChat="_"+a;
+        lastChat = "_" + a;
         db.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                unread="";
-                for(DataSnapshot ds2:dataSnapshot.getChildren()){
-                    User u2=ds2.getValue(User.class);
-                    if(u2.email.contains(a+"\\"))
-                    {
+                unread = "";
+                for (DataSnapshot ds2 : dataSnapshot.getChildren()) {
+                    User u2 = ds2.getValue(User.class);
+                    assert u2 != null;
+                    if (u2.email.contains(a + "\\")) {
 
-                        unread=unread+u2.email;
+                        unread = unread + u2.email;
                         //un.add(u2.email);
                     }
                     /*if (u2.email.contains(p + "\\")) {
@@ -187,14 +183,14 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                     }*/
                 }
 
-                FileInputStream fis=null;
+                FileInputStream fis = null;
                 try {
-                    fis=openFileInput(fname);
+                    fis = openFileInput(fname);
                     t.removeAllViews();
-                    InputStreamReader isr=new InputStreamReader(fis);
-                    BufferedReader br=new BufferedReader(isr);
+                    InputStreamReader isr = new InputStreamReader(fis);
+                    BufferedReader br = new BufferedReader(isr);
                     String text;
-                    String g=unread;
+                    String g = unread;
                     while ((text = br.readLine()) != null) {
                         //Toast.makeText(getApplicationContext(),g,Toast.LENGTH_SHORT).show();
                         if (text.contains(a + "\\")) {
@@ -202,12 +198,12 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                             LayoutInflater inflater = getLayoutInflater();
 
                             if (!g.contains(text)) {
-                                if (z.contains("...R\\")){
-                                    View v = inflater.inflate(R.layout.seenreply, null);
+                                if (z.contains("...R\\")) {
+                                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.seenreply, null);
                                     TextView tvt = v.findViewById(R.id.message);
-                                    TextView tvt2=v.findViewById(R.id.remessage);
-                                    tvt2.setText(z.substring(0,z.indexOf("R\\")));
-                                    z=z.substring(z.indexOf("R\\")+2);
+                                    TextView tvt2 = v.findViewById(R.id.remessage);
+                                    tvt2.setText(z.substring(0, z.indexOf("R\\")));
+                                    z = z.substring(z.indexOf("R\\") + 2);
                                     if (z.indexOf('$') > -1) {
                                         String p;
                                         p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
@@ -220,9 +216,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                     t.addView(v);
                                     row++;
                                     reply.add(v.getId());
-                                }
-                                else {
-                                    View v = inflater.inflate(R.layout.seen, null);
+                                } else {
+                                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.seen, null);
                                     TextView tvt = v.findViewById(R.id.message);
                                     if (z.indexOf('$') > -1) {
                                         String p;
@@ -240,12 +235,12 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                             } else {
                                 //Toast.makeText(getApplicationContext(), unread, Toast.LENGTH_SHORT).show();
 
-                                if (z.contains("...R\\")){
-                                    View v = inflater.inflate(R.layout.right_chat_reply, null);
+                                if (z.contains("...R\\")) {
+                                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.right_chat_reply, null);
                                     TextView tvt = v.findViewById(R.id.message);
-                                    TextView tvt2=v.findViewById(R.id.remessage);
-                                    tvt2.setText(z.substring(0,z.indexOf("R\\")));
-                                    z=z.substring(z.indexOf("R\\")+2);
+                                    TextView tvt2 = v.findViewById(R.id.remessage);
+                                    tvt2.setText(z.substring(0, z.indexOf("R\\")));
+                                    z = z.substring(z.indexOf("R\\") + 2);
                                     if (z.indexOf('$') > -1) {
                                         String p;
                                         p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
@@ -259,9 +254,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                     t.addView(v);
                                     row++;
                                     reply.add(v.getId());
-                                }
-                                else {
-                                    View v = inflater.inflate(R.layout.right_chat, null);
+                                } else {
+                                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.right_chat, null);
                                     TextView tvt = v.findViewById(R.id.message);
                                     if (z.indexOf('$') > -1) {
                                         String p;
@@ -284,12 +278,12 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                             String z = (text.substring(text.indexOf('\\') + 1));
                             LayoutInflater inflater = getLayoutInflater();
 
-                            if (z.contains("...R\\")){
-                                View v = inflater.inflate(R.layout.left_chat_reply, null);
+                            if (z.contains("...R\\")) {
+                                @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.left_chat_reply, null);
                                 TextView tvt = v.findViewById(R.id.message);
-                                TextView tvt2=v.findViewById(R.id.remessage);
-                                tvt2.setText(z.substring(0,z.indexOf("R\\")));
-                                z=z.substring(z.indexOf("R\\")+2);
+                                TextView tvt2 = v.findViewById(R.id.remessage);
+                                tvt2.setText(z.substring(0, z.indexOf("R\\")));
+                                z = z.substring(z.indexOf("R\\") + 2);
                                 if (z.indexOf('$') > -1) {
                                     String p;
                                     p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
@@ -302,9 +296,8 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                 t.addView(v);
                                 row++;
                                 reply.add(v.getId());
-                            }
-                            else {
-                                View v = inflater.inflate(R.layout.left_chat, null);
+                            } else {
+                                @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.left_chat, null);
                                 TextView tvt = v.findViewById(R.id.message);
                                 if (z.indexOf('$') > -1) {
                                     String p;
@@ -332,13 +325,11 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                         }
                     });
 
-                }
-                catch(Exception e){
+                } catch (Exception e) {
                     //Toast.makeText(getApplicationContext(),"File Doesnt exist",Toast.LENGTH_SHORT).show();
-                }
-                finally{
+                } finally {
                     checkReply();
-                    if(!blocks.contains(fname))
+                    if (!blocks.contains(fname))
                         newChats();
 
                 }
@@ -353,53 +344,54 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
         //show();
         //viewChat();
     }
-    public void checkReply(){
-        for(int i=0;i<row;i++){
-            View v=t.getChildAt(i);
-            try{
-            final TextView tv=v.findViewById(R.id.message);
-            tv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //Toast.makeText(getApplicationContext(),tv.getText().toString().substring(0,tv.getText().toString().length()-8).trim(),Toast.LENGTH_SHORT).show();
-                    String nn=tv.getText().toString().substring(0,tv.getText().toString().length()-8).trim();
-                    if(nn.length()>100)
-                        nn=nn.substring(0,100)+"...";
-                    else
-                        nn=nn+"...";
-                    re.setText(nn+"\n\n");
-                    re.setVisibility(View.VISIBLE);
-                    scr.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            scr.fullScroll(View.FOCUS_DOWN);
-                        }
-                    });
 
-                }
-            });}catch (Exception e){}
+    public void checkReply() {
+        for (int i = 0; i < row; i++) {
+            View v = t.getChildAt(i);
+            try {
+                final TextView tv = v.findViewById(R.id.message);
+                tv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //Toast.makeText(getApplicationContext(),tv.getText().toString().substring(0,tv.getText().toString().length()-8).trim(),Toast.LENGTH_SHORT).show();
+                        String nn = tv.getText().toString().substring(0, tv.getText().toString().length() - 8).trim();
+                        if (nn.length() > 100)
+                            nn = nn.substring(0, 100) + "...";
+                        else
+                            nn = nn + "...";
+                        re.setText(nn + "\n\n");
+                        re.setVisibility(View.VISIBLE);
+                        scr.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                scr.fullScroll(View.FOCUS_DOWN);
+                            }
+                        });
+
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public void newChats(){
+    public void newChats() {
         db.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot dss:dataSnapshot.getChildren()){
-                    User uu=dss.getValue(User.class);
-                    final String ss=(uu.email);
-                    if(ss.contains(p+"\\") && ss.contains(":"))
-                    {
+                for (DataSnapshot dss : dataSnapshot.getChildren()) {
+                    User uu = dss.getValue(User.class);
+                    final String ss = (uu.email);
+                    if (ss.contains(p + "\\") && ss.contains(":")) {
                         try {
-                            final FileOutputStream fos=openFileOutput(fname,MODE_APPEND);
-                            if(!check(ss) && activityOnline==1)
-                            {
+                            final FileOutputStream fos = openFileOutput(fname, MODE_APPEND);
+                            if (!check(ss) && activityOnline == 1) {
                                 fos.write((ss + "\n").getBytes());
-                                autotext=ss;
+                                autotext = ss;
                             }
-                            if(activityOnline==1)
-                            {
-                                db.child(dss.getKey()).removeValue();
+                            if (activityOnline == 1) {
+                                db.child(Objects.requireNonNull(dss.getKey())).removeValue();
                             }
                         } catch (IOException e) {
 
@@ -414,57 +406,52 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                     });
                 }
                 String time = new SimpleDateFormat("HH", Locale.getDefault()).format(new Date());
-                int t=Integer.parseInt(time);
-                if(!autotext.contains("Crypton says- ") && (autotext.contains("good morning") || autotext.contains("Good morning") || autotext.contains("Good Morning") || autotext.contains("GOOD MORNING"))&& bot==1 && (t>=4 && t<12) ) {
+                int t = Integer.parseInt(time);
+                if (!autotext.contains("Crypton says- ") && (autotext.contains("good morning") || autotext.contains("Good morning") || autotext.contains("Good Morning") || autotext.contains("GOOD MORNING")) && bot == 1 && (t >= 4 && t < 12)) {
 
                     autotext = "";
                     try {
-                        addChat(a+"\\"+"Crypton says- Good Morning");
+                        addChat(a + "\\" + "Crypton says- Good Morning");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-                else if(!autotext.contains("Crypton says- ") && (autotext.contains("good afternoon") || autotext.contains("Good Afternoon") || autotext.contains("Good afternoon") || autotext.contains("GOOD AFTERNOON"))&& bot==1 && (t>=12 && t<16)) {
+                } else if (!autotext.contains("Crypton says- ") && (autotext.contains("good afternoon") || autotext.contains("Good Afternoon") || autotext.contains("Good afternoon") || autotext.contains("GOOD AFTERNOON")) && bot == 1 && (t >= 12 && t < 16)) {
 
                     autotext = "";
                     try {
-                        addChat(a+"\\"+"Crypton says- Good Afternoon");
+                        addChat(a + "\\" + "Crypton says- Good Afternoon");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-                else if(!autotext.contains("Crypton says- ") && (autotext.contains("good evening") || autotext.contains("Good Evening") || autotext.contains("Good evening") || autotext.contains("GOOD EVENING"))&& bot==1 && (t>=16 && t<20)) {
+                } else if (!autotext.contains("Crypton says- ") && (autotext.contains("good evening") || autotext.contains("Good Evening") || autotext.contains("Good evening") || autotext.contains("GOOD EVENING")) && bot == 1 && (t >= 16 && t < 20)) {
 
                     autotext = "";
                     try {
-                        addChat(a+"\\"+"Crypton says- Good Evening");
+                        addChat(a + "\\" + "Crypton says- Good Evening");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-                else if(!autotext.contains("Crypton says- ") && (autotext.contains("good night") || autotext.contains("Good night") || autotext.contains("Good Night") || autotext.contains("GOOD NIGHT"))&& bot==1 && (t>=20 || t<3)) {
+                } else if (!autotext.contains("Crypton says- ") && (autotext.contains("good night") || autotext.contains("Good night") || autotext.contains("Good Night") || autotext.contains("GOOD NIGHT")) && bot == 1 && (t >= 20 || t < 3)) {
 
                     autotext = "";
                     try {
-                        addChat(a+"\\"+"Crypton says- Good Night");
+                        addChat(a + "\\" + "Crypton says- Good Night");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-                else if(!autotext.contains("Crypton says- ") && (autotext.contains("hello") || autotext.contains("Hello") || autotext.contains("HELLO"))&& bot==1 ) {
+                } else if (!autotext.contains("Crypton says- ") && (autotext.contains("hello") || autotext.contains("Hello") || autotext.contains("HELLO")) && bot == 1) {
 
                     autotext = "";
                     try {
-                        addChat(a+"\\"+"Crypton says- Hello");
+                        addChat(a + "\\" + "Crypton says- Hello");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-                else if(!autotext.contains("Crypton says- ") && (autotext.contains("thank you") || autotext.contains("thanks") || autotext.contains("Thank You") || autotext.contains("Thank you") || autotext.contains("Thanks") || autotext.contains("THANK YOU") || autotext.contains("THANKS"))&& bot==1 && (t>=20 || t<3)) {
+                } else if (!autotext.contains("Crypton says- ") && (autotext.contains("thank you") || autotext.contains("thanks") || autotext.contains("Thank You") || autotext.contains("Thank you") || autotext.contains("Thanks") || autotext.contains("THANK YOU") || autotext.contains("THANKS")) && bot == 1 && (t >= 20 || t < 3)) {
 
                     autotext = "";
                     try {
-                        addChat(a+"\\"+"Crypton says- Welcome");
+                        addChat(a + "\\" + "Crypton says- Welcome");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -480,51 +467,46 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.chat_menu,menu);
+        getMenuInflater().inflate(R.menu.chat_menu, menu);
         return true;
     }
 
     @Override
     protected boolean onPrepareOptionsPanel(View view, Menu menu) {
-        MenuItem item=menu.findItem(R.id.item6);
-        if(blocks.contains(fname))
-        {
+        MenuItem item = menu.findItem(R.id.item6);
+        if (blocks.contains(fname)) {
             item.setTitle("Unblock");
-        }
-        else {
+        } else {
             item.setTitle("Block");
         }
         return true;
     }
 
     public boolean check(String t) throws IOException {
-        FileInputStream fis=null;
-        fis=openFileInput(fname);
-        InputStreamReader isr=new InputStreamReader(fis);
-        BufferedReader br=new BufferedReader(isr);
+        FileInputStream fis = null;
+        fis = openFileInput(fname);
+        InputStreamReader isr = new InputStreamReader(fis);
+        BufferedReader br = new BufferedReader(isr);
         String text;
-        while((text=br.readLine())!=null){
-            if(t.equals(text))
+        while ((text = br.readLine()) != null) {
+            if (t.equals(text))
                 return true;
         }
         return false;
     }
 
 
-
     public void addChat(String n) throws IOException {
         String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
         String currentTime = new SimpleDateFormat("hh:mm aa", Locale.getDefault()).format(new Date());
         //String currentTime2 = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-        if(n.contains("^BLOCK^")) {
+        if (n.contains("^BLOCK^")) {
             User b = new User("Block");
-            db.child(a+"\\"+"BLOCK").setValue(b);
-        }
-        else if(n.contains("^UNBLOCK^")){
-            User b= new User("Unblock");
-            db.child(a+"\\"+"BLOCK").setValue(b);
-        }
-        else {
+            db.child(a + "\\" + "BLOCK").setValue(b);
+        } else if (n.contains("^UNBLOCK^")) {
+            User b = new User("Unblock");
+            db.child(a + "\\" + "BLOCK").setValue(b);
+        } else {
             n = n + "$" + currentDate + "#" + currentTime;
             User u = new User(n);
             db.push().setValue(u);
@@ -558,9 +540,9 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
             if (z.contains("...R\\")) {
                 View v = inflater.inflate(R.layout.right_chat_reply, null);
                 TextView tvt = v.findViewById(R.id.message);
-                TextView tvtv=v.findViewById(R.id.remessage);
-                tvtv.setText(z.substring(0,z.indexOf("R\\")));
-                z=z.substring(z.indexOf("R\\")+2);
+                TextView tvtv = v.findViewById(R.id.remessage);
+                tvtv.setText(z.substring(0, z.indexOf("R\\")));
+                z = z.substring(z.indexOf("R\\") + 2);
                 if (z.indexOf('$') > -1) {
                     String p;
                     p = z.substring(0, z.indexOf('$')) + "    " + z.substring(z.indexOf('#') + 1);
@@ -600,7 +582,7 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                 while ((p1 = br.readLine()) != null) {
                     last.add(p1);
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
             }
             FileOutputStream fos2 = openFileOutput(lastChat, MODE_PRIVATE);
             String p1 = fname;
@@ -615,34 +597,33 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onBackPressed() {
-        if(re.getVisibility()==View.VISIBLE){
+        if (re.getVisibility() == View.VISIBLE) {
             re.setText("");
             re.setVisibility(View.INVISIBLE);
             return;
         }
 
         finishAndRemoveTask();
-        f=1;
-        activityOnline=0;
-        startActivity(new Intent(getApplicationContext(),ChatBox.class));
+        f = 1;
+        activityOnline = 0;
+        startActivity(new Intent(getApplicationContext(), ChatBox.class));
     }
 
     @Override
     public void onClick(View v) {
-        if(v==b)
-        {
-            if(blocks.contains(fname)){
+        if (v == b) {
+            if (blocks.contains(fname)) {
                 Toast.makeText(getApplicationContext(), "Please unblock at first", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if(fl==1) {
+            if (fl == 1) {
                 String n = text.getText().toString();
-                String nre=re.getText().toString();
+                String nre = re.getText().toString();
                 if (n.length() == 0) {
                     Toast.makeText(getApplicationContext(), "Message cannot be blank", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(re.getVisibility()==View.INVISIBLE) {
+                if (re.getVisibility() == View.INVISIBLE) {
                     text.setText("");
                     text.setHint("Type your message");
                     try {
@@ -650,42 +631,39 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                     } catch (IOException e) {
 
                     }
-                }
-                else{
-                    nre=nre.substring(0,nre.indexOf("\n\n"));
+                } else {
+                    nre = nre.substring(0, nre.indexOf("\n\n"));
                     text.setText("");
                     text.setHint("Type your message");
                     re.setText("\n");
                     re.setVisibility(View.INVISIBLE);
-                    while(n.length()<36 && nre.length()>n.length())
-                        n=n+" ";
-                try {
+                    while (n.length() < 36 && nre.length() > n.length())
+                        n = n + " ";
+                    try {
                         addChat(a + "\\" + nre + "R\\" + n);
                     } catch (IOException e) {
 
                     }
                 }
-            }
-            else
-            {
-                Toast.makeText(getApplicationContext(),"Chat is Blocked",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Chat is Blocked", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.item4:
-                Intent intent=new Intent(getApplicationContext(),ProfilePerson.class);
-                intent.putExtra("Email",p);
+                Intent intent = new Intent(getApplicationContext(), ProfilePerson.class);
+                intent.putExtra("Email", p);
                 finish();
                 startActivity(intent);
                 return true;
             case R.id.item5:
                 /*Snackbar.make(findViewById(R.id.scrollView2), "Delete Chats will be available in next Update", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();*/
-                AlertDialog.Builder alt=new AlertDialog.Builder(this);
+                AlertDialog.Builder alt = new AlertDialog.Builder(this);
                 alt.setTitle("Warning!")
                         .setCancelable(false)
                         .setMessage("Are you sure you want to clear the chats from your phone? If you want to delete your unread chats for everyone,cancel this, go to home page and long press on the chat.")
@@ -693,10 +671,10 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
-                                    final FileOutputStream fos=openFileOutput(fname,MODE_PRIVATE);
+                                    final FileOutputStream fos = openFileOutput(fname, MODE_PRIVATE);
                                     fos.write("".getBytes());
                                     t.removeAllViews();
-                                    Toast.makeText(getApplicationContext(),"Chats deleted",Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), "Chats deleted", Toast.LENGTH_SHORT).show();
                                 } catch (IOException e) {
 
                                 }
@@ -708,11 +686,11 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                                 dialog.dismiss();
                             }
                         });
-                AlertDialog aaa=alt.create();
+                AlertDialog aaa = alt.create();
                 aaa.show();
 
                 try {
-                    chatbase(a,p);
+                    chatbase(a, p);
                 } catch (IOException e) {
 
                 }
@@ -754,40 +732,39 @@ public class Chats extends AppCompatActivity implements View.OnClickListener {
                     item.setTitle("Block");
 
                  */
-                if(item.getTitle().equals("Block")){
+                if (item.getTitle().equals("Block")) {
                     blocks.add(fname);
-                    String gg="";
+                    String gg = "";
                     try {
-                        FileOutputStream fos=openFileOutput(fblock,MODE_PRIVATE);
-                        for(String blocklist:blocks){
-                            gg=gg+blocklist+"\n";
+                        FileOutputStream fos = openFileOutput(fblock, MODE_PRIVATE);
+                        for (String blocklist : blocks) {
+                            gg = gg + blocklist + "\n";
                         }
                         fos.write(gg.getBytes());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    Toast.makeText(getApplicationContext(),"Blocked",Toast.LENGTH_SHORT).show();
-                    activityOnline=0;
+                    Toast.makeText(getApplicationContext(), "Blocked", Toast.LENGTH_SHORT).show();
+                    activityOnline = 0;
                     finish();
-                    startActivity(new Intent(getApplicationContext(),ChatBox.class));
+                    startActivity(new Intent(getApplicationContext(), ChatBox.class));
 
-                }
-                else if(item.getTitle().equals("Unblock")){
+                } else if (item.getTitle().equals("Unblock")) {
                     blocks.remove(fname);
-                    String gg="";
+                    String gg = "";
                     try {
-                        FileOutputStream fos=openFileOutput(fblock,MODE_PRIVATE);
-                        for(String blocklist:blocks){
-                            gg=gg+blocklist+"\n";
+                        FileOutputStream fos = openFileOutput(fblock, MODE_PRIVATE);
+                        for (String blocklist : blocks) {
+                            gg = gg + blocklist + "\n";
                         }
                         fos.write(gg.getBytes());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    Toast.makeText(getApplicationContext(),"Unblocked",Toast.LENGTH_SHORT).show();
-                    activityOnline=0;
+                    Toast.makeText(getApplicationContext(), "Unblocked", Toast.LENGTH_SHORT).show();
+                    activityOnline = 0;
                     finish();
-                    startActivity(new Intent(getApplicationContext(),ChatBox.class));
+                    startActivity(new Intent(getApplicationContext(), ChatBox.class));
 
                 }
                 return true;

@@ -1,7 +1,6 @@
 package com.example.chat;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -32,62 +30,61 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-public class Edit extends AppCompatActivity implements View.OnClickListener{
+public class Edit extends AppCompatActivity implements View.OnClickListener {
     TextView t;
-    EditText u,s;
+    EditText u, s;
     DatabaseReference db;
     FirebaseAuth auth;
     Button b;
     private StorageReference mStorageRef;
-    public static final int PICK_IMAGE=1;
+    public static final int PICK_IMAGE = 1;
     private Uri imageuri;
     ImageView profile;
     String durl;
     ProgressDialog progress;
-    String name,status,domain;
+    String name, status, domain;
     TextView res;
-    int sound,chatbot;
+    int sound, chatbot;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
-        t=findViewById(R.id.textView4);
-        u=findViewById(R.id.name);
-        s=findViewById(R.id.status);
-        b=findViewById(R.id.save);
-        res=findViewById(R.id.resetPass);
+        t = findViewById(R.id.textView4);
+        u = findViewById(R.id.name);
+        s = findViewById(R.id.status);
+        b = findViewById(R.id.save);
+        res = findViewById(R.id.resetPass);
         res.setVisibility(View.VISIBLE);
         res.setOnClickListener(this);
         b.setOnClickListener(this);
-        profile=findViewById(R.id.profilepic);
-        progress=new ProgressDialog(this);
+        profile = findViewById(R.id.profilepic);
+        progress = new ProgressDialog(this);
         mStorageRef = FirebaseStorage.getInstance().getReference();
         t.setText("Edit Your Details");
-        imageuri=null;
-        auth=FirebaseAuth.getInstance();
-        domain=auth.getCurrentUser().getEmail().substring(auth.getCurrentUser().getEmail().indexOf('@'));
-        db= FirebaseDatabase.getInstance().getReference().child("Users");
+        imageuri = null;
+        auth = FirebaseAuth.getInstance();
+        domain = auth.getCurrentUser().getEmail().substring(auth.getCurrentUser().getEmail().indexOf('@'));
+        db = FirebaseDatabase.getInstance().getReference().child("Users");
         db.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 progress.setMessage("Loading...");
                 progress.show();
-                for(DataSnapshot d:dataSnapshot.getChildren()) {
-                    Details det=d.getValue(Details.class);
-                    String z1=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
-                    if(z1.contains("."))
-                    {
-                        z1=z1.replace('.','!');
+                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                    Details det = d.getValue(Details.class);
+                    String z1 = auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
+                    if (z1.contains(".")) {
+                        z1 = z1.replace('.', '!');
                     }
-                    if(d.getKey().equals(z1))
-                    {
+                    if (d.getKey().equals(z1)) {
                         u.setText(det.n);
                         s.setText(det.s);
-                        sound=det.soundEffect;
-                        chatbot=det.chatbot;
+                        sound = det.soundEffect;
+                        chatbot = det.chatbot;
                         Glide.with(getApplicationContext()).load(det.l).into(profile);
                         progress.dismiss();
-                        durl=det.l;
+                        durl = det.l;
                         break;
                     }
                 }
@@ -103,46 +100,41 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        if(v==b) {
-            name=u.getText().toString();
-            status=s.getText().toString();
-            if(name.equals(""))
-            {
+        if (v == b) {
+            name = u.getText().toString();
+            status = s.getText().toString();
+            if (name.equals("")) {
                 Toast.makeText(getApplicationContext(), "Name cannot be blank", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if(status.equals(""))
-            {
+            if (status.equals("")) {
                 Toast.makeText(getApplicationContext(), "Status cannot be blank", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if(name.contains("!") || name.contains("@") || name.contains("#") || name.contains("$") || name.contains("%") || name.contains("^") || name.contains("&") || name.contains("(") || name.contains(")") || name.contains("*"))
-            {
+            if (name.contains("!") || name.contains("@") || name.contains("#") || name.contains("$") || name.contains("%") || name.contains("^") || name.contains("&") || name.contains("(") || name.contains(")") || name.contains("*")) {
                 Toast.makeText(getApplicationContext(), "Name cannot contain special characters '!','@','#','%','^','&','*','(' and ')'", Toast.LENGTH_SHORT).show();
                 return;
             }
             storeimage();
         }
-        if(v==profile){
+        if (v == profile) {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent,"Select a picture"),PICK_IMAGE);
+            startActivityForResult(Intent.createChooser(intent, "Select a picture"), PICK_IMAGE);
         }
-        if(v==res){
+        if (v == res) {
             res.setVisibility(View.INVISIBLE);
-            String forgetPasswordEmail=auth.getCurrentUser().getEmail().toString();
+            String forgetPasswordEmail = auth.getCurrentUser().getEmail().toString();
             auth.sendPasswordResetEmail(forgetPasswordEmail)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            if(task.isSuccessful())
-                            {
-                                Toast.makeText(getApplicationContext(),"Reset Password link sent to your email.",Toast.LENGTH_SHORT).show();
-                            }
-                            else{
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getApplicationContext(), "Reset Password link sent to your email.", Toast.LENGTH_SHORT).show();
+                            } else {
                                 res.setVisibility(View.VISIBLE);
-                                Toast.makeText(getApplicationContext(),task.getException().getMessage(),Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
 
                         }
@@ -150,17 +142,15 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
         }
     }
 
-    public void storeimage()
-    {
+    public void storeimage() {
         try {
             if (imageuri != null) {
-                String z1=auth.getCurrentUser().getEmail()
-                        .substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
-                if(z1.contains("."))
-                {
-                    z1=z1.replace('.','!');
+                String z1 = auth.getCurrentUser().getEmail()
+                        .substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
+                if (z1.contains(".")) {
+                    z1 = z1.replace('.', '!');
                 }
-                final StorageReference user_profile = mStorageRef.child( z1+".jpg");
+                final StorageReference user_profile = mStorageRef.child(z1 + ".jpg");
                 progress.setTitle("Uploading...");
                 progress.show();
                 progress.setCancelable(false);
@@ -176,15 +166,15 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
                                     public void onSuccess(Uri uri) {
 
                                         String img_url = uri.toString();// to store url of the image
-                                        Details d=new Details(name,status,img_url,domain,sound,chatbot);
-                                        String z2=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
-                                        if(z2.contains("."))
-                                            z2=z2.replace('.','!');
+                                        Details d = new Details(name, status, img_url, domain, sound, chatbot);
+                                        String z2 = auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
+                                        if (z2.contains("."))
+                                            z2 = z2.replace('.', '!');
                                         db.child(z2).setValue(d);
-                                        Toast.makeText(getApplicationContext(),"Details Saved",Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), "Details Saved", Toast.LENGTH_SHORT).show();
                                         progress.dismiss();
                                         finish();
-                                        startActivity(new Intent(getApplicationContext(),Login.class));
+                                        startActivity(new Intent(getApplicationContext(), Login.class));
 
                                     }
                                 });
@@ -193,21 +183,20 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
                         .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                                progress.setMessage((int)(100*taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount())+ " % Completed");
+                                progress.setMessage((int) (100 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount()) + " % Completed");
                             }
                         });
             } else {
-                Details d=new Details(name,status,durl,domain,sound,chatbot);
-                String z2=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
-                if(z2.contains("."))
-                    z2=z2.replace('.','!');
+                Details d = new Details(name, status, durl, domain, sound, chatbot);
+                String z2 = auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
+                if (z2.contains("."))
+                    z2 = z2.replace('.', '!');
                 db.child(z2).setValue(d);
-                Toast.makeText(getApplicationContext(),"Details Saved",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Details Saved", Toast.LENGTH_SHORT).show();
                 finish();
-                startActivity(new Intent(getApplicationContext(),Login.class));
+                startActivity(new Intent(getApplicationContext(), Login.class));
             }
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
@@ -215,17 +204,18 @@ public class Edit extends AppCompatActivity implements View.OnClickListener{
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==PICK_IMAGE && resultCode == RESULT_OK){
+        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
             try {
-                imageuri=data.getData();
+                imageuri = data.getData();
                 profile.setImageURI(imageuri);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
     }
 
     @Override
     public void onBackPressed() {
         finish();
-        startActivity(new Intent(getApplicationContext(),ChatBox.class));
+        startActivity(new Intent(getApplicationContext(), ChatBox.class));
     }
 }

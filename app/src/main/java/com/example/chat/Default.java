@@ -1,14 +1,14 @@
 package com.example.chat;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -26,17 +26,18 @@ public class Default extends AppCompatActivity {
     FirebaseAuth auth;
     DatabaseReference db;
     String a;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_default);
         getSupportActionBar().hide();
         try {
-            auth=FirebaseAuth.getInstance();
-            a=auth.getCurrentUser().getEmail().substring(0,auth.getCurrentUser().getEmail().indexOf('@'));
-            if(a.contains("."))
-                a=a.replace('.','!');
-            db=FirebaseDatabase.getInstance().getReference().child("Users").child(a);
+            auth = FirebaseAuth.getInstance();
+            a = auth.getCurrentUser().getEmail().substring(0, auth.getCurrentUser().getEmail().indexOf('@'));
+            if (a.contains("."))
+                a = a.replace('.', '!');
+            db = FirebaseDatabase.getInstance().getReference().child("Users").child(a);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -45,9 +46,9 @@ public class Default extends AppCompatActivity {
             db.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Details d=dataSnapshot.getValue(Details.class);
-                    if(d.soundEffect==1){
-                        MediaPlayer ring= MediaPlayer.create(getApplicationContext(),R.raw.home);
+                    Details d = dataSnapshot.getValue(Details.class);
+                    if (d.soundEffect == 1) {
+                        MediaPlayer ring = MediaPlayer.create(getApplicationContext(), R.raw.home);
                         ring.start();
                     }
                 }
@@ -58,9 +59,9 @@ public class Default extends AppCompatActivity {
                 }
             });
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
-        timer=new Timer();
+        timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -68,6 +69,6 @@ public class Default extends AppCompatActivity {
                 startActivity(i);
                 Default.this.finish();
             }
-        },2000);
+        }, 2000);
     }
 }
